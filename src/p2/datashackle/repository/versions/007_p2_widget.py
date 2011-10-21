@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import cssutils
-import os
-import sys
-from optparse import OptionParser
 from sqlalchemy.sql import select, and_
+
+from p2.datashackle.repository.utils import styles_path
+from p2.datashackle.repository.utils import write_cssrule, write_form_cssrule
+from p2.datashackle.repository.utils import flush_cssrules
 
 mod = __import__('001_initial_schema')
 p2_fieldtype = getattr(mod, 'p2_fieldtype')
@@ -19,41 +19,6 @@ p2_span_relation = getattr(mod, 'p2_span_relation')
 p2_span_action = getattr(mod, 'p2_span_action')
 p2_span_dropdown = getattr(mod, 'p2_span_dropdown')
 
-parser = OptionParser()
-parser.add_option("-m", "--management-styles",
-    dest="management_styles",
-    default=False,
-    help="Use this option to specify directory of management css styles.")
-options, args = parser.parse_args(sys.argv)
-path_styles = options.management_styles
-
-stylesheets = {}
-
-def write_cssrule(plan_id, selector_text, value):
-    stylesheet_name = str(plan_id) + '.css'
-    if stylesheet_name in stylesheets:
-        stylesheet = stylesheets[stylesheet_name]
-    else:
-        stylesheet_filepath = os.path.join(path_styles, stylesheet_name)
-        stylesheet_exists = os.path.exists(stylesheet_filepath)
-        if stylesheet_exists:
-            stylesheet = cssutils.parseFile(stylesheet_filepath, encoding='utf-8')
-        else:
-            stylesheet = cssutils.css.CSSStyleSheet()
-        stylesheets[stylesheet_name] = stylesheet
-
-    declarations = value.split(';')
-    for declaration in declarations:
-        colon = declaration.find(':')
-        css_property = declaration[:colon]
-        css_value = declaration[colon + 1:]
-        declaration = cssutils.css.CSSStyleDeclaration()
-        declaration[css_property] = css_value
-        css_rule = cssutils.css.CSSStyleRule(
-            selectorText=selector_text,
-            style=declaration
-        )
-        stylesheet.add(css_rule)
 
 def write_widget_cssrule(id, value):
     plan_id = select([p2_plan.c.plan_identifier], 
@@ -439,12 +404,12 @@ def upgrade(migrate_engine):
     # Labeltext
     #
     insStmt = data.p2_form.insert()
+    identifier = data.generate_random_identifier()
     result = insStmt.execute(active=True,
-                             height=310,
-                             width=310,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="labeltext",
                              fk_p2_plan='p2_widget')
+    write_form_cssrule(identifier, 'height:310px; width:310px')
     labeltext_form_id = result.inserted_primary_key[0]
     
     create_relation_widget(data, labeltext_form_id, 0, 0,
@@ -472,25 +437,26 @@ def upgrade(migrate_engine):
     
 
     # Properties label span            
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(active=True,
-                         height=20,
-                         width=200,
-                         form_identifier=data.generate_random_identifier(),
+                         form_identifier=identifier,
                          form_name="properties_label",
                          fk_p2_plan='p2_span')
+    write_form_cssrule(identifier, 'height:20px; width:200px')
+
     properties_label_id = result.inserted_primary_key[0]
     
     create_checkbox_widget(data, properties_label_id, 'Label visible', 0, 0, 'visible', True, tab_order=0)
    
 
     # Properties alphanumeric span
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(active=True,
-        height=100,
-        width=302,
-        form_identifier=data.generate_random_identifier(),
+        form_identifier=identifier,
         form_name="properties_alphanumeric",
         fk_p2_plan='p2_span_alphanumeric'
     )
+    write_form_cssrule(identifier, 'height:100px; width:302px')
     properties_alphanumeric_id = result.inserted_primary_key[0]
 
 
@@ -563,12 +529,12 @@ def upgrade(migrate_engine):
     # Fileupload
     #
     insStmt = data.p2_form.insert()
+    identifier = data.generate_random_identifier()
     result = insStmt.execute(active=True,
-                             height=320,
-                             width=400,
-                             form_identifier="63161474",
+                             form_identifier=identifier,
                              form_name="fileupload",
                              fk_p2_plan='p2_widget')
+    write_form_cssrule(identifier, 'height:320px; width:400px')
     propertyform_id = result.inserted_primary_key[0]
     
     create_relation_widget(data, propertyform_id, 0, 0,
@@ -594,12 +560,12 @@ def upgrade(migrate_engine):
     
     # properties_linkage form:
     insStmt = data.p2_form.insert()
+    identifier = data.generate_random_identifier()
     result = insStmt.execute(active=True,
-                         height=80,
-                         width=345,
-                         form_identifier=data.generate_random_identifier(),
+                         form_identifier=identifier,
                          form_name="properties_linkage_fileupload",
                          fk_p2_plan='p2_linkage')
+    write_form_cssrule(identifier, 'height:80px; width:345px')
     form_id = result.inserted_primary_key[0]
     
     # add widgets
@@ -610,14 +576,14 @@ def upgrade(migrate_engine):
     
     
     # properties_fileupload form
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(
                              active=True,
-                             height=125,
-                             width=350,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="properties_fileupload",
                              fk_p2_plan='p2_span_fileupload',
                              )
+    write_form_cssrule(identifier, 'height:125px; width:350px')
     form_id = result.inserted_primary_key[0]
 
     create_relation_widget(data, form_id, 0, 0,
@@ -673,12 +639,12 @@ def upgrade(migrate_engine):
     # Checkbox 
     #
     insStmt = data.p2_form.insert()
+    identifier = data.generate_random_identifier()
     result = insStmt.execute(active=True,
-                             height=310,
-                             width=310,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="checkbox",
                              fk_p2_plan='p2_widget')
+    write_form_cssrule(identifier, 'height:310px; width:310px')
     form_id = result.inserted_primary_key[0]
     
 
@@ -706,12 +672,12 @@ def upgrade(migrate_engine):
    
 
     # Properties checkbox span
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(active=True,
-                         height=40,
-                         width=302,
-                         form_identifier=data.generate_random_identifier(),
+                         form_identifier=identifier,
                          form_name="properties_checkbox",
                          fk_p2_plan='p2_span_checkbox')
+    write_form_cssrule(identifier, 'height:40px;width:302px')
     form_id = result.inserted_primary_key[0]
 
     create_labeltext_widget(data, form_id, 0, 0, 'Table field', 'field_identifier', None, tab_order=0)
@@ -764,13 +730,12 @@ def upgrade(migrate_engine):
     #
     
     insStmt = data.p2_form.insert()
+    identifier = data.generate_random_identifier()
     result = insStmt.execute(active=True,
-                             height=300,
-                             width=400,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="relation",
                              fk_p2_plan='p2_widget')
-
+    write_form_cssrule(identifier, 'height:300px; width:400px') 
     form_id = result.inserted_primary_key[0]
     
     create_relation_widget(data, form_id, 0, 0,
@@ -817,14 +782,14 @@ def upgrade(migrate_engine):
 
 
     # BEG target form form
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(
                              active=True,
-                             height=40,
-                             width=350,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="target_form",
                              fk_p2_plan='p2_span_relation',
                              )
+    write_form_cssrule(identifier, 'height:40px; width:350px') 
     form_id = result.inserted_primary_key[0]
      
     # "plan_identifier" widget
@@ -839,14 +804,14 @@ def upgrade(migrate_engine):
 
 
     # properties_relation form
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(
                              active=True,
-                             height=40,
-                             width=350,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="properties_relation",
                              fk_p2_plan='p2_span_relation',
                              )
+    write_form_cssrule(identifier, 'height:40px; width:350px')
     form_id = result.inserted_primary_key[0]
      
     # "filter clause"   
@@ -870,15 +835,14 @@ def upgrade(migrate_engine):
 
 
     # properties_linkage form (only wrapper form for p2_relation_span)
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(
                              active=True,
-                             height=140,
-                             width=350,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="properties_linkage",
                              fk_p2_plan='p2_span_relation',
                              )
-
+    write_form_cssrule(identifier, 'height:140px; width:350px')
     form_id = result.inserted_primary_key[0]
     
     create_relation_widget(data, form_id, 0, 0,
@@ -892,12 +856,12 @@ def upgrade(migrate_engine):
 
     # properties_linkage form
     insStmt = data.p2_form.insert()
+    identifier = data.generate_random_identifier()
     result = insStmt.execute(active=True,
-                         height=100,
-                         width=345,
-                         form_identifier=data.generate_random_identifier(),
+                         form_identifier=identifier,
                          form_name="properties_linkage",
                          fk_p2_plan='p2_linkage')
+    write_form_cssrule(identifier, 'height:100px; width:345px')
     form_id = result.inserted_primary_key[0]
     
     create_dropdown_widget(
@@ -996,15 +960,13 @@ def upgrade(migrate_engine):
     #
     # Dropdown widget
     #
-    
+    identifier = data.generate_random_identifier() 
     insStmt = data.p2_form.insert()
     result = insStmt.execute(active=True,
-                             height=300,
-                             width=400,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="dropdown",
                              fk_p2_plan='p2_widget')
-
+    write_form_cssrule(identifier, 'height:300px; width:400px')
     form_id = result.inserted_primary_key[0]
     
     create_relation_widget(data, form_id, 0, 0,
@@ -1047,15 +1009,14 @@ def upgrade(migrate_engine):
 
 
     # Property forms for dropdown widget
-
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(
                              active=True,
-                             height=100,
-                             width=400,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="properties_dropdown",
                              fk_p2_plan='p2_span_dropdown',
                              )
+    write_form_cssrule(identifier, 'height:100px; width:400px')
     form_id = result.inserted_primary_key[0]
      
     ## "filter clause"   
@@ -1081,15 +1042,14 @@ def upgrade(migrate_engine):
     create_checkbox_widget(data, form_id, 'Required', 0, 40, 'required', True, tab_order=2)
 
     # properties_dropdown_linkage form for plan p2_span_dropdown (only wrapper form)
+    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(
                              active=True,
-                             height=45,
-                             width=350,
-                             form_identifier=data.generate_random_identifier(),
+                             form_identifier=identifier,
                              form_name="properties_dropdown_linkage",
                              fk_p2_plan='p2_span_dropdown',
                              )
-
+    write_form_cssrule(identifier, 'height:45px; width:350px')
     form_id = result.inserted_primary_key[0]
     
     create_relation_widget(data, form_id, 0, 0,
@@ -1104,12 +1064,12 @@ def upgrade(migrate_engine):
     
     # properties_dropdown_linkage form for plan p2_linkage
     insStmt = data.p2_form.insert()
+    identifier = data.generate_random_identifier()
     result = insStmt.execute(active=True,
-                         height=40,
-                         width=345,
-                         form_identifier=data.generate_random_identifier(),
+                         form_identifier=identifier,
                          form_name="properties_dropdown_linkage",
                          fk_p2_plan='p2_linkage')
+    write_form_cssrule(identifier, 'height:40px; width:345px')
     form_id = result.inserted_primary_key[0]
     
     # add widgets
@@ -1169,13 +1129,8 @@ def upgrade(migrate_engine):
     create_labeltext_widget(data, migrate_engine.data['p2_plan_form_id'], 0, 20, 'Setobject class name', 'so_type', None, tab_order=1, text_width=250)
    
 
-
     # write stylesheets out to disk
-    for (stylesheet_name, stylesheet) in stylesheets.items():
-        stylesheet_filepath = os.path.join(path_styles, stylesheet_name)
-        fh = open(stylesheet_filepath, 'w+')
-        fh.write(stylesheet.cssText)
-        fh.close()
+    flush_cssrules()
     
 def downgrade(migrate_engine):
     pass

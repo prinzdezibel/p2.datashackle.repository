@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from p2.datashackle.repository.utils import write_form_cssrule
+from p2.datashackle.repository.utils import flush_cssrules
+
+
 def upgrade(migrate_engine):
     mod = __import__('001_initial_schema')
     
@@ -26,12 +30,12 @@ def upgrade(migrate_engine):
     data.archetype_plan_id = last_inserted_id
     
     insStmt = data.p2_form.insert()
+    identifier = data.generate_random_identifier()
     result = insStmt.execute(active=True,
-                         height=300,
-                         width=230,
-                         form_identifier=data.generate_random_identifier(),
+                         form_identifier=identifier,
                          form_name="archetypes",
                          fk_p2_plan=last_inserted_id)
+    write_form_cssrule(identifier, 'height:300px; width:230px')
     last_inserted_id = result.inserted_primary_key[0]
     migrate_engine.data['archetype_form_id'] = last_inserted_id
     
@@ -167,6 +171,8 @@ def upgrade(migrate_engine):
                              cascade='all'
                              )
     migrate_engine.data['span_fileupload2linkage'] = result.inserted_primary_key[0]
+
+    flush_cssrules()
 
 def downgrade(migrate_engine):
     pass
