@@ -38,12 +38,12 @@ def upgrade(migrate_engine):
                              so_module='p2.datashackle.management.span.span',
                              so_type='SpanType')
 
-    #RelationSpan plan
+    #EmbeddedformSpan plan
     insStmt = p2_plan.insert()
-    result = insStmt.execute(plan_identifier='p2_span_relation',
-                             so_module='p2.datashackle.management.span.relation',
-                             so_type='Relation')
-    relation_span_plan_id = result.inserted_primary_key[0]
+    result = insStmt.execute(plan_identifier='p2_span_embeddedform',
+                             so_module='p2.datashackle.management.span.embeddedform',
+                             so_type='EmbeddedForm')
+    embeddedform_span_plan_id = result.inserted_primary_key[0]
 
     # FileuploadSpan plan
     insStmt = p2_plan.insert()
@@ -77,6 +77,11 @@ def upgrade(migrate_engine):
     p2_plan.insert().execute(plan_identifier='p2_countries',
                              so_module='p2.datashackle.core.models.setobject_types',
                              so_type='p2_country')
+
+    # A plan that operates on p2_form
+    result = p2_plan.insert().execute(plan_identifier='p2_form',
+                             so_module='p2.datashackle.management.form.form',
+                             so_type='FormType')
 
 def downgrade(migrate_engine):
     pass

@@ -13,7 +13,7 @@ def upgrade(migrate_engine):
     data.p2_widget = getattr(mod, 'p2_widget')
     data.p2_span = getattr(mod, 'p2_span')
     data.p2_linkage = getattr(mod, 'p2_linkage')
-    data.p2_span_relation = getattr(mod, 'p2_span_relation')
+    data.p2_span_embeddedform = getattr(mod, 'p2_span_embeddedform')
     data.p2_span_fileupload = getattr(mod, 'p2_span_fileupload')
     data.p2_span_action = getattr(mod, 'p2_span_action')
     data.p2_span_alphanumeric = getattr(mod, 'p2_span_alphanumeric')
@@ -144,19 +144,19 @@ def upgrade(migrate_engine):
                              cascade='save-update, merge'
                              )
 
-    # p2_span_relation -> p2_linkage
+    # p2_span_embeddedform -> p2_linkage
     result = insStmt.execute(id=data.generate_random_identifier(),
                              attr_name='linkage',
                              ref_type='object',
                              foreignkeycol='fk_p2_linkage',
-                             source_module='p2.datashackle.management.span.relation',
-                             source_classname='Relation',
+                             source_module='p2.datashackle.management.span.embeddedform',
+                             source_classname='EmbeddedForm',
                              target_classname='Linkage',
                              target_module='p2.datashackle.core.models.linkage',
                              fk_cardinality=migrate_engine.data['cardinalities']['n:1'],
                              cascade='all'
                              )
-    migrate_engine.data['span_relation2linkage'] = result.inserted_primary_key[0]
+    migrate_engine.data['span_embeddedform2linkage'] = result.inserted_primary_key[0]
     
     # p2_span_fileupload -> p2_linkage
     result = insStmt.execute(id=data.generate_random_identifier(),

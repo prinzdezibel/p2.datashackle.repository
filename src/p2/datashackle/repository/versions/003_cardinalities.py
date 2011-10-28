@@ -29,7 +29,9 @@ def upgrade(migrate_engine):
         '1(fk):1' : generate_random_identifier(),
         '1:1(fk)' : generate_random_identifier(),
         'n:1' : generate_random_identifier(),
-        'n:m' : generate_random_identifier()
+        'n:m' : generate_random_identifier(),
+        'Tree hierarchy' : generate_random_identifier(),
+        'None' : generate_random_identifier(),
         }
     
     for cardinalityvalue,cardinalityid in cardinalitydict.items():

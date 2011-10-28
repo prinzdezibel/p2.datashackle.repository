@@ -123,7 +123,7 @@ p2_span_dropdown = Table('p2_span_dropdown',
                  )
 
 # This table inherits all attributes from p2_span!
-p2_span_relation = Table('p2_span_relation',
+p2_span_embeddedform = Table('p2_span_embeddedform',
                  metadata,
                  Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
                  Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE")),
@@ -220,7 +220,7 @@ def downgrade(migrate_engine):
     p2_span_alphanumeric.drop(migrate_engine)
     p2_span_action.drop(migrate_engine)
     p2_span_fileupload.drop(migrate_engine)
-    p2_span_relation.drop(migrate_engine)
+    p2_span_embeddedform.drop(migrate_engine)
     p2_span.drop(migrate_engine)
     p2_linkage.drop(migrate_engine)
     p2_archetype.drop(migrate_engine)
