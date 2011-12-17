@@ -25,13 +25,12 @@ def upgrade(migrate_engine):
     metadata.bind = migrate_engine
     
     migrate_engine.data['cardinalities'] = cardinalitydict = {
-        '1:n' : generate_random_identifier(),
-        '1(fk):1' : generate_random_identifier(),
-        '1:1(fk)' : generate_random_identifier(),
-        'n:1' : generate_random_identifier(),
-        'n:m' : generate_random_identifier(),
-        'Tree hierarchy' : generate_random_identifier(),
-        'None' : generate_random_identifier(),
+        '1:n' : 'ONE_TO_MANY',
+        '1(fk):1' : 'ONE(FK)_TO_ONE',
+        '1:1(fk)' : 'ONE_TO_ONE(FK)',
+        'n:1' : 'MANY_TO_ONE',
+        'n:m' : 'MANY_TO_MANY',
+        'None': 'NONE',
         }
     
     for cardinalityvalue,cardinalityid in cardinalitydict.items():
@@ -41,8 +40,8 @@ def upgrade(migrate_engine):
         )
 
     p2_plan.insert().execute(plan_identifier='p2_cardinality',
-                             so_module='p2.datashackle.core.models.setobject_types',
-                             so_type='p2_cardinality')
+                             so_module='p2.datashackle.core.models.cardinality',
+                             so_type='Cardinality')
     
 
 def downgrade(migrate_engine):

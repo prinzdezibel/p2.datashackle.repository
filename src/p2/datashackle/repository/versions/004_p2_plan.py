@@ -18,6 +18,12 @@ p2_form = getattr(mod, 'p2_form')
 
 def upgrade(migrate_engine):
     
+    # p2_relation plan
+    relation_plan_id = 'p2_relation'
+    result = p2_plan.insert().execute(plan_identifier=relation_plan_id,
+                             so_module='p2.datashackle.core.models.relation',
+                             so_type='Relation')
+    
     # p2_linkage plan
     result = p2_plan.insert().execute(plan_identifier='p2_linkage',
                              so_module='p2.datashackle.core.models.linkage',

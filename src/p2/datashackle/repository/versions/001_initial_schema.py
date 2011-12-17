@@ -47,27 +47,41 @@ p2_widget = Table('p2_widget',
 
 p2_cardinality = Table('p2_cardinality',
    metadata,
-   Column('id', String(length=8), primary_key=True, nullable=False, autoincrement=False),
+   Column('id', String(length=32), primary_key=True, nullable=False, autoincrement=False),
    Column('cardinality', String(64), nullable=False),
    mysql_engine='InnoDB',
 )
+
+p2_embform_characteristic = Table('p2_embform_characteristic',
+   metadata,
+   Column('id', String(length=32), primary_key=True, nullable=False, autoincrement=False),
+   Column('title', String(64), nullable=False),
+   mysql_engine='InnoDB',
+)
+
+p2_relation = Table('p2_relation',
+             metadata,
+             Column('id', String(8), primary_key=True, autoincrement=False),
+             Column('foreignkeycol', String(63), nullable=True),
+             Column('foreignkeycol2', String(63), nullable=True), # Required for n:m relations
+             Column('source_table', String(255), nullable=True),
+             Column('target_table', String(255), nullable=True),
+             Column('xref_table', String(255), nullable=True),
+             Column('fk_p2_cardinality', ForeignKey('p2_cardinality.id'), onupdate="CASCADE", nullable=False),
+             mysql_engine='InnoDB')
 
 p2_linkage = Table('p2_linkage',
              metadata,
              Column('id', String(8), primary_key=True, autoincrement=False),
              Column('attr_name', String(63), nullable=True),
-             Column('ref_type', String(63), nullable=False, default='dict'),
              Column('ref_key', String(63), nullable=True),
-             Column('foreignkeycol', String(63), nullable=True),
-             Column('foreignkeycol2', String(63), nullable=True), # Required for n:m relations
              Column('source_module', String(255), nullable=True),
              Column('source_classname', String(255), nullable=True),
              Column('target_module', String(255), nullable=True),
              Column('target_classname', String(255), nullable=True),
-             Column('xref_table', String(255), nullable=True),
              Column('back_populates', String(63), nullable=True),
              Column('cascade', String(255), nullable=True),
-             Column('fk_cardinality', ForeignKey('p2_cardinality.id'), nullable=True),
+             Column('fk_p2_relation', ForeignKey('p2_relation.id', onupdate="CASCADE"), nullable=True),
              Column('post_update', Boolean), #http://www.sqlalchemy.org/docs/05/mappers.html#rows-that-point-to-themselves-mutually-dependent-rows
              mysql_engine='InnoDB')
 
@@ -126,19 +140,22 @@ p2_span_dropdown = Table('p2_span_dropdown',
 p2_span_embeddedform = Table('p2_span_embeddedform',
                  metadata,
                  Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
-                 Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE")),
                  Column('form_name', String(63), nullable=True),
                  Column('plan_identifier', String(63), nullable=True),
                  Column('filter_clause', String(255), nullable=True),
                  Column('editable', Boolean, default=True),
+                 Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE"), nullable=True),
+                 Column('fk_characteristic', ForeignKey('p2_embform_characteristic.id', onupdate="CASCADE"), nullable=True),
+                 Column('adjacency_linkage', String(8), nullable=True),
                  mysql_engine='InnoDB'
                  )
 
-# This table inherits all attributes from p2_span!
+# Joined table inheritance. This table inherits all attributes from p2_span!
 p2_span_fileupload = Table('p2_span_fileupload',
                  metadata,
-                 Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True), # Joined table inheritance!
+                 Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
                  Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE")),
+                 Column('fk_p2_relation', ForeignKey('p2_relation.id', onupdate="CASCADE")),
                  mysql_engine='InnoDB'
                  )
 
@@ -221,8 +238,10 @@ def downgrade(migrate_engine):
     p2_span_action.drop(migrate_engine)
     p2_span_fileupload.drop(migrate_engine)
     p2_span_embeddedform.drop(migrate_engine)
-    p2_span.drop(migrate_engine)
     p2_linkage.drop(migrate_engine)
+    p2_relation.drop(migrate_engine) 
+    p2_embform_characteristic.drop(migrate_engine)
+    p2_span.drop(migrate_engine)
     p2_archetype.drop(migrate_engine)
     p2_widget.drop(migrate_engine)
     p2_form.drop(migrate_engine)
