@@ -12,12 +12,15 @@ p2_plan = getattr(mod, 'p2_plan')
 p2_form = getattr(mod, 'p2_form')
 
 parser = OptionParser()
-parser.add_option("-m", "--management-styles",
-    dest="management_styles",
+parser.add_option("-m", "--sys-staticresource-path",
+    dest="sys_staticresource_path",
     default=False,
-    help="Use this option to specify directory of management css styles.")
+    help="Use this option to specify directory of system css styles for datashackle management backend.")
+parser.add_option("-m", "--user-styles-path",
+    dest="user_styles_path",
+    default=False,
+    help="Use this option to specify directory of user css styles for datashackle management backend.")
 options, args = parser.parse_args(sys.argv)
-styles_path = options.management_styles
 
 stylesheets = {}
 
@@ -34,12 +37,22 @@ def write_form_cssrule(form_id, style):
     selector = 'div[data-form-identifier="' + form_id + '"].selector-strip'
     write_cssrule(plan_id, selector, style)
 
+def styles_path(plan_id):
+    if str(plan_id).startswith('p2_'):
+        styles_path = os.path.join(options.sys_staticresource_path, 'models')
+    else:
+        styles_path = options.user_styles_path
+    return styles_path
+
 def write_cssrule(plan_id, selector_text, value):
     stylesheet_name = str(plan_id) + '.css'
     if stylesheet_name in stylesheets:
         stylesheet = stylesheets[stylesheet_name]
     else:
-        stylesheet_filepath = os.path.join(styles_path, stylesheet_name)
+        stylesheet_filepath = os.path.join(
+            styles_path(stylesheet_name),
+            stylesheet_name
+        )
         stylesheet_exists = os.path.exists(stylesheet_filepath)
         if stylesheet_exists:
             stylesheet = cssutils.parseFile(stylesheet_filepath, encoding='utf-8')
@@ -77,7 +90,10 @@ def write_cssrule(plan_id, selector_text, value):
 def flush_cssrules():
     global stylesheets
     for (stylesheet_name, stylesheet) in stylesheets.items():
-        stylesheet_filepath = os.path.join(styles_path, stylesheet_name)
+        stylesheet_filepath = os.path.join(
+            styles_path(stylesheet_name),
+            stylesheet_name
+        )
         fh = open(stylesheet_filepath, 'w+')
         fh.write(stylesheet.cssText)
         fh.close()
