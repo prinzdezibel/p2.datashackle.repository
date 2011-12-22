@@ -12,11 +12,11 @@ p2_plan = getattr(mod, 'p2_plan')
 p2_form = getattr(mod, 'p2_form')
 
 parser = OptionParser()
-parser.add_option("-m", "--sys-staticresource-path",
+parser.add_option("-s", "--sys-staticresource-path",
     dest="sys_staticresource_path",
     default=False,
-    help="Use this option to specify directory of system css styles for datashackle management backend.")
-parser.add_option("-m", "--user-styles-path",
+    help="Use this option to specify static base directory of system css styles for datashackle management backend.")
+parser.add_option("-u", "--user-styles-path",
     dest="user_styles_path",
     default=False,
     help="Use this option to specify directory of user css styles for datashackle management backend.")

@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `p2_sqlmigrate` (
 --
 
 INSERT INTO `p2_sqlmigrate` (`repository_id`, `repository_path`, `version`) VALUES
-('landpuls.de', '/Users/michaeljenny/projects/landpuls.de/src/p2.datashackle.repository/src/p2/datashackle/repository', 0);
+('landpuls.de', '/Users/michaeljenny/projects/landpuls.de/checkouts/p2.datashackle.repository/src/p2/datashackle/repository', 0);
 
 -- --------------------------------------------------------
 
