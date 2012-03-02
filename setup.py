@@ -24,7 +24,9 @@ setup(name='p2.datashackle.repository',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          # -*- Extra requirements: -*-
+          'sqlalchemy-migrate',
+          'MySQL-python',
+          'cssutils'
       ],
       entry_points="""
       # -*- Entry points: -*-
