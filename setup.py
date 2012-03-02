@@ -26,7 +26,6 @@ setup(name='p2.datashackle.repository',
           'setuptools',
           'sqlalchemy-migrate',
           'MySQL-python',
-          'cssutils'
       ],
       entry_points="""
       # -*- Entry points: -*-

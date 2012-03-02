@@ -33,6 +33,7 @@ p2_form = Table('p2_form',
                 Column('form_identifier', String(8), primary_key=True, autoincrement=False),
                 Column('form_name', String(63)),
                 Column('fk_p2_plan', ForeignKey('p2_plan.plan_identifier'), nullable=True),
+                Column('css', String(1023), nullable=False, default=''),
                 mysql_engine='InnoDB',
                 )
 
@@ -41,6 +42,7 @@ p2_widget = Table('p2_widget',
                 Column('widget_identifier', String(8), primary_key=True, autoincrement=False),
                 Column('fk_p2_form', ForeignKey('p2_form.form_identifier')),
                 Column('widget_type', String(63), nullable=False),
+                Column('css', String(1023), nullable=False, default=''),
                 Column('tab_order', Integer, nullable=False, default=0),
                 mysql_engine='InnoDB',
                 )
@@ -93,6 +95,7 @@ p2_span = Table('p2_span',
             Column('span_name', String(63), index=True),
             Column('span_type', String(63), nullable=False),
             Column('span_value', String(255), nullable=True),
+            Column('css', String(1023), nullable=False, default=''),
             Column('visible', Boolean, nullable=True, default=True),
             Column('order', Integer, primary_key=True, autoincrement=True), # Primary key is only temporarily. We are interested in the autoincrement functionality. See below.
             mysql_engine='InnoDB',
@@ -145,7 +148,7 @@ p2_span_embeddedform = Table('p2_span_embeddedform',
                  Column('filter_clause', String(255), nullable=True),
                  Column('editable', Boolean, default=True),
                  Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE"), nullable=True),
-                 Column('fk_characteristic', ForeignKey('p2_embform_characteristic.id', onupdate="CASCADE"), nullable=True),
+                 Column('fk_characteristic', ForeignKey('p2_embform_characteristic.id', onupdate="CASCADE"), nullable=False, default="LIST"),
                  Column('adjacency_linkage', String(8), nullable=True),
                  mysql_engine='InnoDB'
                  )

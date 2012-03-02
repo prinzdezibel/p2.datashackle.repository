@@ -10,8 +10,6 @@ from sqlalchemy import *
 from migrate import *
 from migrate.changeset import *
 
-from p2.datashackle.repository.utils import write_form_cssrule
-from p2.datashackle.repository.utils import flush_cssrules
 
 # Relative path imports are not possible. Therefore this workaround that allows them
 # (paths will be relative to this script's container directory (NOT the current working dir!))
@@ -62,14 +60,13 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(active=True,
         form_identifier=identifier,
         form_name="default_form",
-        fk_p2_plan=plan_id
-        )
-    write_form_cssrule(identifier, 'height:400px; width:500px')
+        fk_p2_plan=plan_id,
+        css="height:400px; width:500px"
+    )
 
     form_id = result.inserted_primary_key[0]
     data.p2_plan.update().where(data.p2_plan.c.plan_identifier == plan_id).execute(fk_default_form=form_id)
     
-    flush_cssrules() 
 
 
 def downgrade(migrate_engine):
