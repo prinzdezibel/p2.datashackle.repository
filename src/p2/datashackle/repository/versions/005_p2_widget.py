@@ -128,7 +128,7 @@ def insert_save_button(data, form_id, tab_order):
 
 def insert_reset_button(data, form_id, tab_order):    
     # Insert Reset Action widget into form
-    css_style="position: absolute; top: 280px; left: 105px"
+    css_style="position: absolute; top: 280px; left: 105px;"
     insStmt = p2_widget.insert()
     identifier = data.generate_random_identifier()
     result = insStmt.execute(widget_identifier=identifier,
@@ -146,7 +146,7 @@ def insert_reset_button(data, form_id, tab_order):
         span_name="button",
         span_type="action",
         span_value="Reset",
-        css="width:60px"
+        css="width:60px;"
     )
 
     p2_span_action.insert().execute(span_identifier=span_identifier,
@@ -379,7 +379,7 @@ def upgrade(migrate_engine):
     
     insStmt = data.p2_form.insert()
     identifier = data.generate_random_identifier()
-    css_style = "height:300px; width:230px"
+    css_style = "height:300px; width:230px;"
     result = insStmt.execute(active=True,
                          form_identifier=identifier,
                          form_name="archetypes",
@@ -430,7 +430,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="plans",
                              fk_p2_plan='p2_plan',
-        css="height:80px; width:410px"
+        css="height:80px; width:410px;"
     )
 
 
@@ -583,7 +583,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="labeltext",
                              fk_p2_plan='p2_widget',
-        css="height:310px; width:310px"
+        css="height:310px; width:310px;"
     )
     
     labeltext_form_id = result.inserted_primary_key[0]
@@ -618,7 +618,7 @@ def upgrade(migrate_engine):
                          form_identifier=identifier,
                          form_name="properties_label",
                          fk_p2_plan='p2_span',
-        css="height:20px; width:200px"
+        css="height:20px; width:200px;"
     )
     
     properties_label_id = result.inserted_primary_key[0]
@@ -632,7 +632,7 @@ def upgrade(migrate_engine):
         form_identifier=identifier,
         form_name="properties_alphanumeric",
         fk_p2_plan='p2_span_alphanumeric',
-        css="height:100px; width:302px"
+        css="height:100px; width:302px;"
     )
     properties_alphanumeric_id = result.inserted_primary_key[0]
 
@@ -713,7 +713,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="fileupload",
                              fk_p2_plan='p2_widget',
-        css="height:320px; width:400px")
+        css="height:320px; width:400px;")
     propertyform_id = result.inserted_primary_key[0]
     
     create_embeddedform_widget(data, propertyform_id, 0, 0,
@@ -735,7 +735,7 @@ def upgrade(migrate_engine):
                                         filter_clause='p2_span.span_name="piggyback"',
                                         tab_order=1,
                                         )
-    create_labeltext_widget(data, propertyform_id, 0, 65, labeltext="Tab order", field_identifier="tab_order", defaultvalue="0", tab_order=2)
+    create_labeltext_widget(data, propertyform_id, 0, 20, labeltext="Tab order", field_identifier="tab_order", defaultvalue="0", tab_order=2)
     
     # properties_linkage form:
     insStmt = data.p2_form.insert()
@@ -744,7 +744,7 @@ def upgrade(migrate_engine):
                          form_identifier=identifier,
                          form_name="properties_linkage_fileupload",
                          fk_p2_plan='p2_linkage',
-        css='height:60px; width:345px'
+        css='height:20px; width:345px;'
     )
     form_id = result.inserted_primary_key[0]
     
@@ -755,7 +755,7 @@ def upgrade(migrate_engine):
     # ========================================================================
     # p2_relation specific controls for FiluploadWidget's property form 
     # 1. Embedded wrapper form on p2_widget_fileupload to p2_span_fileupload
-    create_embeddedform_widget(data, propertyform_id, 0, 80,
+    create_embeddedform_widget(data, propertyform_id, 0, 40,
                                         labeltext="",
                                         linkage_id=migrate_engine.data['widget_span_linkage'],
                                         form_name="fileupload_relationproperties",
@@ -771,7 +771,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="fileupload_relationproperties",
                              fk_p2_plan='p2_span_fileupload',
-        css="height:20px; width:350px"
+        css="height:20px; width:350px;"
     )
     
     # 3. Linkage p2_span_fileupload -> p2_relation
@@ -805,7 +805,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="fileupload_relationproperties",
                              fk_p2_plan='p2_relation',
-        css="height:320px; width:400px"
+        css="height:20px; width:302px;"
     )
     
     # 6. Create widgets for form fileupload_relationproperties on p2_relation    
@@ -823,11 +823,11 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="properties_fileupload",
                              fk_p2_plan='p2_span_fileupload',
-        css="height:125px; width:350px"
+        css="height:125px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
 
-    create_embeddedform_widget(data, form_id, 0, 0,
+    create_embeddedform_widget(data, form_id, 0, 40,
                              labeltext="Linkage properties (Embeddedform span -> Linkage)",
                              linkage_id=migrate_engine.data['span_fileupload2linkage'],
                              form_name="properties_linkage_fileupload",
@@ -888,7 +888,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="checkbox",
                              fk_p2_plan='p2_widget',
-        css="height:310px; width:310px"
+        css="height:310px; width:310px;"
     )
     form_id = result.inserted_primary_key[0]
     
@@ -922,7 +922,7 @@ def upgrade(migrate_engine):
                          form_identifier=identifier,
                          form_name="properties_checkbox",
                          fk_p2_plan='p2_span_checkbox',
-        css="height:40px;width:302px"
+        css="height:40px;width:302px;"
     )
     form_id = result.inserted_primary_key[0]
 
@@ -984,7 +984,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="embeddedform",
                              fk_p2_plan='p2_widget',
-        css="height:300px; width:400px"
+        css="height:300px; width:400px;"
     )
     form_id = result.inserted_primary_key[0]
    
@@ -1088,7 +1088,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="target_form",
                              fk_p2_plan='p2_span_embeddedform',
-        css="height:40px; width:350px"
+        css="height:40px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
      
@@ -1107,7 +1107,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="properties_embeddedform",
                              fk_p2_plan='p2_span_embeddedform',
-        css="height:80px; width:350px"
+        css="height:80px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
      
@@ -1161,7 +1161,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="properties_linkage",
                              fk_p2_plan='p2_span_embeddedform',
-        css="height:120px; width:350px"
+        css="height:120px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
     
@@ -1200,7 +1200,7 @@ def upgrade(migrate_engine):
                          form_identifier=identifier,
                          form_name="properties_linkage",
                          fk_p2_plan='p2_linkage',
-        css="height:120px; width:350px"
+        css="height:120px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
    
@@ -1244,7 +1244,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="properties_characteristic",
                              fk_p2_plan='p2_relation',
-        css="height:80px; width:350px"
+        css="height:80px; width:350px;"
     )
     
     # 2 . Create widgets for form properties_characteristic on p2_relation    
@@ -1363,7 +1363,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="dropdown",
                              fk_p2_plan='p2_widget',
-        css="height:300px; width:400px"
+        css="height:300px; width:400px;"
     )
     form_id = result.inserted_primary_key[0]
     
@@ -1413,7 +1413,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="properties_dropdown",
                              fk_p2_plan='p2_span_dropdown',
-        css="height:100px; width:400px"
+        css="height:100px; width:400px;"
      )
     form_id = result.inserted_primary_key[0]
      
@@ -1442,7 +1442,7 @@ def upgrade(migrate_engine):
                              form_identifier=identifier,
                              form_name="properties_dropdown_linkage",
                              fk_p2_plan='p2_span_dropdown',
-        css="height:45px; width:350px"
+        css="height:45px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
     
@@ -1463,7 +1463,7 @@ def upgrade(migrate_engine):
                          form_identifier=identifier,
                          form_name="properties_dropdown_linkage",
                          fk_p2_plan='p2_linkage',
-        css="height:40px; width:345px"
+        css="height:40px; width:345px;"
     )
     form_id = result.inserted_primary_key[0]
     
@@ -1555,7 +1555,7 @@ def upgrade(migrate_engine):
         form_identifier=identifier,
         form_name="default_form",
         fk_p2_plan='p2_form',
-        css="height:60px; width:400px"
+        css="height:60px; width:400px;"
     )
 
     stmt = p2_plan.update().values(fk_default_form=identifier).where(
