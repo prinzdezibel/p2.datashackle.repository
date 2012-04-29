@@ -22,30 +22,45 @@ metadata = MetaData()
 p2_plan = Table('p2_plan',
                 metadata,
                 Column('plan_identifier', String(length=255), primary_key=True, nullable=False, autoincrement=False),
-                Column('fk_default_form', String(8), index=True),
+                Column('fk_default_form', String(10), index=True),
                 Column('so_module', String(255), nullable=False),
                 Column('so_type', String(255), nullable=False),
                 mysql_engine='InnoDB',
                 )
 
+
+# Layout options
+# 0 : form layout (absolute positioning)
+# 1 : list layout (document flow)
+# 2 : tree layout (document flow)
 p2_form = Table('p2_form',
                 metadata,
-                Column('form_identifier', String(8), primary_key=True, autoincrement=False),
+                Column('form_identifier', String(10), primary_key=True, autoincrement=False),
                 Column('form_name', String(63)),
                 Column('fk_p2_plan', ForeignKey('p2_plan.plan_identifier'), nullable=True),
                 Column('css', String(1023), nullable=False, default=''),
+                Column('fk_p2_formlayout',
+                       ForeignKey('p2_formlayout.id'),
+                       onupdate="CASCADE",
+                       default='FORM'),
                 mysql_engine='InnoDB',
                 )
 
 p2_widget = Table('p2_widget',
                 metadata,
-                Column('widget_identifier', String(8), primary_key=True, autoincrement=False),
+                Column('widget_identifier', String(10), primary_key=True, autoincrement=False),
                 Column('fk_p2_form', ForeignKey('p2_form.form_identifier')),
-                Column('widget_type', String(63), nullable=False),
+                #Column('widget_type', String(63), nullable=False),
+                Column('widget_type', ForeignKey('p2_widget_type.id'),
+                       onupdate="CASCADE"),
                 Column('css', String(1023), nullable=False, default=''),
                 Column('tab_order', Integer, nullable=False, default=0),
                 mysql_engine='InnoDB',
                 )
+
+p2_widget_type = Table('p2_widget_type', metadata,
+                       Column('id', String(12), primary_key=True, autoincrement=False),
+                       mysql_engine='InnoDB')
 
 p2_cardinality = Table('p2_cardinality',
    metadata,
@@ -63,7 +78,7 @@ p2_embform_characteristic = Table('p2_embform_characteristic',
 
 p2_relation = Table('p2_relation',
              metadata,
-             Column('id', String(8), primary_key=True, autoincrement=False),
+             Column('id', String(10), primary_key=True, autoincrement=False),
              Column('foreignkeycol', String(63), nullable=True),
              Column('foreignkeycol2', String(63), nullable=True), # Required for n:m relations
              Column('source_table', String(255), nullable=True),
@@ -74,7 +89,7 @@ p2_relation = Table('p2_relation',
 
 p2_linkage = Table('p2_linkage',
              metadata,
-             Column('id', String(8), primary_key=True, autoincrement=False),
+             Column('id', String(10), primary_key=True, autoincrement=False),
              Column('attr_name', String(63), nullable=True),
              Column('ref_key', String(63), nullable=True),
              Column('source_module', String(255), nullable=True),
@@ -90,7 +105,7 @@ p2_linkage = Table('p2_linkage',
 
 p2_span = Table('p2_span',
             metadata,
-            Column('span_identifier', String(8)),
+            Column('span_identifier', String(10)),
             Column('fk_p2_widget', ForeignKey('p2_widget.widget_identifier')),
             Column('span_name', String(63), index=True),
             Column('span_type', String(63), nullable=False),
@@ -110,7 +125,7 @@ DDL("ALTER TABLE p2_span DROP PRIMARY KEY, ADD UNIQUE KEY(`order`); ALTER TABLE 
 # This table inherits all attributes from p2_span!
 p2_span_alphanumeric = Table('p2_span_alphanumeric',
                  metadata,
-                 Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True), # Joined table inheritance!
+                 Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True), # Joined table inheritance!
                  Column('attr_name', String(63), nullable=True),
                  Column('field_identifier', String(63), nullable=True),
                  #Column('multi_line', Boolean, nullable=True),
@@ -122,7 +137,7 @@ p2_span_alphanumeric = Table('p2_span_alphanumeric',
 # This table inherits all attributes from p2_span!
 p2_span_checkbox = Table('p2_span_checkbox',
                  metadata,
-                 Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True), # Joined table inheritance!
+                 Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True), # Joined table inheritance!
                  Column('attr_name', String(63), nullable=True),
                  Column('field_identifier', String(63), nullable=True),
                  mysql_engine='InnoDB'
@@ -131,7 +146,7 @@ p2_span_checkbox = Table('p2_span_checkbox',
 # This table inherits all attributes from p2_span!
 p2_span_dropdown = Table('p2_span_dropdown',
                  metadata,
-                 Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
+                 Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
                  Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE")),
                  Column('plan_identifier', String(63), nullable=True),
                  Column('attr_name', String(63), nullable=True),
@@ -142,21 +157,21 @@ p2_span_dropdown = Table('p2_span_dropdown',
 # This table inherits all attributes from p2_span!
 p2_span_embeddedform = Table('p2_span_embeddedform',
                  metadata,
-                 Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
+                 Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
                  Column('form_name', String(63), nullable=True),
                  Column('plan_identifier', String(63), nullable=True),
                  Column('filter_clause', String(255), nullable=True),
                  Column('editable', Boolean, default=True),
                  Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE"), nullable=True),
                  Column('fk_characteristic', ForeignKey('p2_embform_characteristic.id', onupdate="CASCADE"), nullable=False, default="LIST"),
-                 Column('adjacency_linkage', String(8), nullable=True),
+                 Column('adjacency_linkage', String(10), nullable=True),
                  mysql_engine='InnoDB'
                  )
 
 # Joined table inheritance. This table inherits all attributes from p2_span!
 p2_span_fileupload = Table('p2_span_fileupload',
                  metadata,
-                 Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
+                 Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
                  Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE")),
                  Column('fk_p2_relation', ForeignKey('p2_relation.id', onupdate="CASCADE")),
                  mysql_engine='InnoDB'
@@ -165,7 +180,7 @@ p2_span_fileupload = Table('p2_span_fileupload',
 # This table inherits all attributes from p2_span!
 p2_span_action = Table('p2_span_action',
                  metadata,
-                 Column('span_identifier', String(8), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True), # Joined table inheritance!
+                 Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True), # Joined table inheritance!
                  Column('msg_reset', Boolean, nullable=False, default=0),
                  Column('msg_close', Boolean, nullable=False, default=0),
                  mysql_engine='InnoDB'
@@ -173,13 +188,13 @@ p2_span_action = Table('p2_span_action',
 
 p2_archetype = Table('p2_archetype',
                          metadata,
-                         Column('id', String(8), primary_key=True, autoincrement=False),
+                         Column('id', String(10), primary_key=True, autoincrement=False),
                          mysql_engine='InnoDB'
                          )
 
 p2_media = Table('p2_media',
                   metadata,
-                  Column('id', String(8), primary_key=True, autoincrement=True),
+                  Column('id', String(10), primary_key=True, autoincrement=True),
                   Column('filename', String(255), nullable=True),
                   Column('size', Integer, nullable=True),
                   Column('data', BLOB(16777215)),
@@ -190,14 +205,14 @@ p2_media = Table('p2_media',
 
 p2_fieldtype = Table('p2_fieldtype',
    metadata,
-   Column('id', String(length=8), primary_key=True, nullable=False, autoincrement=False),
+   Column('id', String(10), primary_key=True, nullable=False, autoincrement=False),
    Column('field_type', String(32), nullable=False),
    mysql_engine='InnoDB',
 )
 
 p2_country = Table('p2_country',
    metadata,
-   Column('id', String(length=8), primary_key=True, nullable=False, autoincrement=False),
+   Column('id', String(10), primary_key=True, nullable=False, autoincrement=False),
    Column('country_name', String(64), nullable=False),
    Column('country_iso_code_2', CHAR(length=2), nullable=False),
    Column('country_iso_code_3', CHAR(length=3), nullable=False),
@@ -206,9 +221,15 @@ p2_country = Table('p2_country',
 
 p2_test = Table('test',
                 metadata,
-                Column('id', String(8), primary_key=True, autoincrement=False),
+                Column('id', String(10), primary_key=True, autoincrement=False),
                 mysql_engine='InnoDB'
                 )
+
+p2_formlayout = Table('p2_formlayout', metadata, 
+                      Column('id', String(10),
+                      primary_key=True, autoincrement=False), 
+                      Column('name', String(16)),
+                      mysql_engine='InnoDB')
 
                                 
 def upgrade(migrate_engine):
@@ -253,3 +274,5 @@ def downgrade(migrate_engine):
     p2_test.drop(migrate_engine)
     p2_cardinality.drop()
     p2_country.drop()
+    p2_formlayout.drop()
+    p2_widget_type.drop()
