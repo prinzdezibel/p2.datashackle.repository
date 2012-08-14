@@ -219,16 +219,11 @@ p2_country = Table('p2_country',
    mysql_engine='InnoDB',
 )
 
-p2_test = Table('test',
-                metadata,
-                Column('id', String(10), primary_key=True, autoincrement=False),
-                mysql_engine='InnoDB'
-                )
 
 p2_formlayout = Table('p2_formlayout', metadata, 
                       Column('id', String(10),
                       primary_key=True, autoincrement=False), 
-                      Column('name', String(16)),
+                      Column('name', String(32)),
                       mysql_engine='InnoDB')
 
                                 
@@ -271,7 +266,6 @@ def downgrade(migrate_engine):
     p2_form.drop(migrate_engine)
     p2_plan.drop(migrate_engine)
     p2_fieldtype.drop(migrate_engine)
-    p2_test.drop(migrate_engine)
     p2_cardinality.drop()
     p2_country.drop()
     p2_formlayout.drop()
