@@ -264,8 +264,8 @@ def upgrade_p2_embform_characteristic(migrate_engine):
 def insert_p2_formlayout_records():
     recs = (
         ('FORM', 'Form'),
-        ('TREE', 'Tree hierarchy'),
-        ('LIST', 'List'),
+        ('TREE', 'Tree hierarchy (not functional)'),
+        ('LIST', 'List (not functional)'),
     )
     for rec in recs:
         p2_formlayout.insert().execute(
