@@ -22,8 +22,7 @@ def upgrade(migrate_engine):
     metadata.bind = migrate_engine
     
     p2_plan.insert().execute(plan_identifier='p2_fieldtype',
-                             so_module='p2.datashackle.core.models.setobject_types',
-                             so_type='p2_fieldtype')
+                             klass='p2_fieldtype', table='p2_fieldtype')
 
     p2_fieldtype.insert().execute(
         id=generate_random_identifier(),

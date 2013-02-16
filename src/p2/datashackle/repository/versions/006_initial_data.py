@@ -48,24 +48,7 @@ data.cardinalities = getattr(__import__('003_cardinalities'), 'cardinalitydict')
 
 
 def upgrade(migrate_engine):
-
-
-    # --- DUMMY DATA (for testing)
-    insStmt = data.p2_plan.insert()
-    result = insStmt.execute(plan_identifier='test',
-                             so_module='p2.datashackle.core.models.setobject_types',
-                             so_type='test')
-    plan_id = result.inserted_primary_key[0]
-    identifier = data.generate_random_identifier()
-    result = data.p2_form.insert().execute(active=True,
-        form_identifier=identifier,
-        form_name="default_form",
-        fk_p2_plan=plan_id,
-        css="height:400px; width:500px"
-    )
-
-    form_id = result.inserted_primary_key[0]
-    data.p2_plan.update().where(data.p2_plan.c.plan_identifier == plan_id).execute(fk_default_form=form_id)
+    pass
     
 
 

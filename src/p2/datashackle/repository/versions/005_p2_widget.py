@@ -258,8 +258,8 @@ def upgrade_p2_embform_characteristic(migrate_engine):
         )
 
     p2_plan.insert().execute(plan_identifier='p2_embform_characteristic',
-                             so_module='p2.datashackle.core.models.setobject_types',
-                             so_type='p2_embform_characteristic')
+                             klass='p2_embform_characteristic',
+                             table='p2_embform_characteristic')
     
 def insert_p2_formlayout_records():
     recs = (
@@ -274,8 +274,7 @@ def insert_p2_formlayout_records():
         )
 
     p2_plan.insert().execute(plan_identifier='p2_formlayout',
-                             so_module='p2.datashackle.core.models.setobject_types',
-                             so_type='p2_formlayout')
+                             klass='p2_formlayout', table="p2_formlayout")
 
 def insert_p2_widget_type_records():
     recs = ('labeltext', 'embeddedform', 'checkbox', 'action', 'dropdown',
@@ -284,8 +283,7 @@ def insert_p2_widget_type_records():
         p2_widget_type.insert().execute(id=type)
     
     p2_plan.insert().execute(plan_identifier='p2_widget_type',
-                             so_module='p2.datashackle.core.models.setobject_types',
-                             so_type='p2_widget_type')
+                             klass='p2_widget_type', table='p2_widget_type')
 
 
 def upgrade(migrate_engine):
@@ -320,11 +318,11 @@ def upgrade(migrate_engine):
             source_table,
             target_table
         ):
-        (source_classname, source_module) = select([p2_plan.c.so_type, p2_plan.c.so_module],
-                and_(p2_form.c.fk_p2_plan == p2_plan.c.plan_identifier, p2_form.c.form_identifier == form_id)
-            ).execute().fetchone()
-        (target_classname, target_module) = select([p2_plan.c.so_type, p2_plan.c.so_module],
-            p2_plan.c.plan_identifier == target_plan).execute().fetchone()
+        (source_model,) = select([p2_plan.c.plan_identifier],
+            and_(p2_form.c.fk_p2_plan == p2_plan.c.plan_identifier,
+                 p2_form.c.form_identifier == form_id)).execute().fetchone()
+        target_model=target_plan
+
         label_width = 150
         
         identifier = migrate_engine.generate_random_identifier()
@@ -356,16 +354,14 @@ def upgrade(migrate_engine):
             attr_name=attr_name,
             ref_key=None,
             foreignkeycol=foreignkeycol,
-            source_module=source_module,
-            source_classname=source_classname,
-            target_module=target_module,
-            target_classname=target_classname,
             back_populates = None,
             fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
             cascade='save-update,merge',
             post_update=None,
             source_table=source_table,
             target_table=target_table,
+            source_model=source_model,
+            target_model=target_model,
         )
     
         identifier = u32_hash('p2_span', 'piggyback', 'dropdown', form_id, attr_name)
@@ -389,8 +385,7 @@ def upgrade(migrate_engine):
     
     insStmt = data.p2_plan.insert()
     result = insStmt.execute(plan_identifier='p2_archetype',   
-                             so_module='p2.datashackle.core.models.setobject_types',
-                             so_type='p2_archetype')
+                             klass='p2_archetype', table='p2_archetype')
     last_inserted_id = result.inserted_primary_key[0]
     data.archetype_plan_id = last_inserted_id
     
@@ -408,12 +403,11 @@ def upgrade(migrate_engine):
     
 
     def insert_linkage(attr_name,
-            source_module, source_classname, target_module, target_classname,
             fk_p2_cardinality, cascade,
-            foreignkeycol, source_table, target_table,
+            foreignkeycol, source_table, source_model,
+            target_table, target_model,
             back_populates=None,
-            ref_key = None, post_update=False
-        ):
+            ref_key = None, post_update=False):
         relation_id = migrate_engine.generate_random_identifier()
         p2_relation.insert().execute(
             id=relation_id,
@@ -424,22 +418,97 @@ def upgrade(migrate_engine):
 
         linkage_id = migrate_engine.generate_random_identifier()
         p2_linkage.insert().execute(
-            id=linkage_id, attr_name=attr_name,
+            id=linkage_id, 
+            attr_name=attr_name,
             ref_key=ref_key,
-            source_module=source_module,
-            source_classname=source_classname,
-            target_classname=target_classname,
-            target_module=target_module,
             back_populates=back_populates,
             cascade=cascade,
             fk_p2_relation=relation_id,
             post_update=post_update,
+            fk_source_model=source_model,
+            fk_target_model=target_model
         )
         return linkage_id
         
          
 ###############################################################################
 ###############################################################################
+    p2_plan.insert().execute(plan_identifier='p2_plan',
+                             klass='Plan', table='p2_plan')
+    p2_plan.insert().execute(plan_identifier='Model',
+                             klass='Model', table='p2_plan')
+    p2_plan.insert().execute(plan_identifier='p2_media',
+                             klass='Media', table='p2_media')
+    p2_plan.insert().execute(plan_identifier='Label',
+                             klass='Label', table='p2_span')
+    p2_plan.insert().execute(plan_identifier='ActionWidget',
+                             klass='ActionWidget', table='p2_widget')
+    p2_plan.insert().execute(plan_identifier='DropdownWidget',
+                             klass='DropdownWidget', table='p2_widget')
+    p2_plan.insert().execute(plan_identifier='CheckboxWidget',
+                             klass='CheckboxWidget', table='p2_widget')
+    p2_plan.insert().execute(plan_identifier='EmbeddedFormWidget',
+                             klass='EmbeddedFormWidget', table='p2_widget')
+    p2_plan.insert().execute(plan_identifier='FileuploadWidget',
+                             klass='FileuploadWidget', table='p2_widget')
+    p2_plan.insert().execute(plan_identifier='Labeltext',
+                             klass='Labeltext', table='p2_widget')
+    relation_plan_id = 'p2_relation'
+    result = p2_plan.insert().execute(plan_identifier=relation_plan_id,
+                             klass='Relation', table='p2_relation')
+    p2_relation_plan_id = result.inserted_primary_key[0]
+    
+
+    # Widget plan
+    insStmt = p2_plan.insert()
+    result = insStmt.execute(plan_identifier='p2_widget',
+                             klass='WidgetType', table="p2_widget")
+    p2_widget_plan_id = result.inserted_primary_key[0]
+
+    # Span plan
+    insStmt = p2_plan.insert()
+    result = insStmt.execute(plan_identifier='p2_span',
+                             klass='SpanType', table='p2_span')
+    p2_span_plan_id = result.inserted_primary_key[0]
+
+    #EmbeddedformSpan plan
+    insStmt = p2_plan.insert()
+    result = insStmt.execute(plan_identifier='p2_span_embeddedform',
+                             klass='EmbeddedForm', table='p2_span_embeddedform')
+    embeddedform_span_plan_id = result.inserted_primary_key[0]
+
+    # FileuploadSpan plan
+    insStmt = p2_plan.insert()
+    result = insStmt.execute(plan_identifier='p2_span_fileupload',
+                             klass='Fileupload', table='p2_span_fileupload')
+    p2_fileupload_span_plan_id = result.inserted_primary_key[0]
+
+    # ActionSpan plan
+    result = p2_plan.insert().execute(plan_identifier='p2_span_action',
+                             klass='Action', table='p2_span_action')
+    action_span_plan_id = result.inserted_primary_key[0]
+    
+    # Alphanumeric plan
+    result = p2_plan.insert().execute(plan_identifier='p2_span_alphanumeric',
+                             klass='Alphanumeric', table='p2_span_alphanumeric')
+    
+    # Checkbox plan
+    result = p2_plan.insert().execute(plan_identifier='p2_span_checkbox',
+                             klass='Checkbox', table='p2_span_checkbox')
+    checkbox_span_plan_id = result.inserted_primary_key[0]
+
+    
+    
+    p2_plan.insert().execute(plan_identifier='p2_countries',
+                             klass='p2_country', table='p2_country')
+
+    # A plan that operates on p2_form
+    result = p2_plan.insert().execute(plan_identifier='p2_form',
+                             klass='FormType', table='p2_form')
+    result = p2_plan.insert().execute(plan_identifier='p2_linkage',
+                             klass='Linkage', table='p2_linkage')
+    last_inserted_id = result.inserted_primary_key[0]
+    p2_linkage_plan_id = last_inserted_id
 
     insStmt = p2_form.insert()
     identifier = migrate_engine.generate_random_identifier()
@@ -463,16 +532,14 @@ def upgrade(migrate_engine):
         attr_name='default_form',
         ref_key=None,
         foreignkeycol='fk_default_form',
-        source_module='p2.datashackle.management.plan.plan',
-        source_classname='Plan',
-        target_classname='FormType',
-        target_module='p2.datashackle.management.form.form',
         fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
         cascade='save-update, merge',
         post_update=True, #http://www.sqlalchemy.org/docs/05/mappers.html#rows-that-point-to-themselves-mutually-dependent-rows
         source_table='p2_plan',
         target_table='p2_form',
-        back_populates=None
+        back_populates=None,
+        source_model='p2_plan',
+        target_model='p2_form',
         )
     
     # plan -> forms[fk]
@@ -480,114 +547,100 @@ def upgrade(migrate_engine):
          attr_name='forms',
          ref_key='form_name',
          foreignkeycol='fk_p2_plan',
-         source_module='p2.datashackle.management.plan.plan',
-         source_classname='Plan',
-         target_classname='FormType',
-         target_module='p2.datashackle.management.form.form',
          post_update=False,
          back_populates='plan',
          fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
          cascade='save-update, merge',
-        source_table='p2_plan',
-        target_table='p2_form',
+         source_table='p2_plan',
+         target_table='p2_form',
+         source_model='p2_plan',
+         target_model='p2_form',
         )
     
     # plan -> forms[fk] (backref)
     result = insert_linkage(
-                             attr_name='plan',
-                             foreignkeycol='fk_p2_plan',
-                             back_populates='forms',
-                             source_module='p2.datashackle.management.form.form',
-                             source_classname='FormType',
-                             target_classname='Plan',
-                             target_module='p2.datashackle.management.plan.plan',
-                             fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
-                             cascade='all',
+        attr_name='plan',
+        foreignkeycol='fk_p2_plan',
+        back_populates='forms',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
+        cascade='all',
         source_table='p2_form',
         target_table='p2_plan',
-        post_update=False
+        post_update=False,
+        source_model='p2_form',
+        target_model='p2_plan',
         )
                              
     # form -> widgets[fk]
     migrate_engine.data['form_widget_linkage'] = insert_linkage(
-                             attr_name='widgets',
-                             foreignkeycol='fk_p2_form',
-                             source_module='p2.datashackle.management.form.form',
-                             source_classname='FormType',
-                             target_classname='WidgetType',
-                             target_module='p2.datashackle.management.widget.widget',
-                             back_populates='form',
-                             fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
-                             cascade='save-update, merge',
+        attr_name='widgets',
+        foreignkeycol='fk_p2_form',
+        back_populates='form',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
+        cascade='save-update, merge',
         source_table='p2_form',
         target_table='p2_widget',
         post_update=False,
+        source_model='p2_form',
+        target_model='p2_widget',
         )
                              
     # widget[fk] -> form (backref)
     result = insert_linkage(
-                             attr_name='form',
-                              foreignkeycol='fk_p2_form',
-                              source_module='p2.datashackle.management.widget.widget',
-                              source_classname='WidgetType',
-                              target_module='p2.datashackle.management.form.form',
-                              target_classname='FormType',
-                              fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
-                              back_populates='widgets',
-                              cascade='save-update, merge',
+        attr_name='form',
+        foreignkeycol='fk_p2_form',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
+        back_populates='widgets',
+        cascade='save-update, merge',
         source_table='p2_widget',
         target_table='p2_form',
         post_update=False,
+        source_model='p2_widget',
+        target_model='p2_form',
         )
     
     # widget -> spans[fk]
     migrate_engine.data['widget_span_linkage'] = insert_linkage(
-                             attr_name='spans',
-                             ref_key='span_name',
-                             foreignkeycol='fk_p2_widget',
-                             source_module='p2.datashackle.management.widget.widget',
-                             source_classname='WidgetType',
-                             target_classname='SpanType',
-                             target_module='p2.datashackle.management.span.span',
-                             fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
-                             back_populates='widget',
-                             cascade='all',
+        attr_name='spans',
+        ref_key='span_name',
+        foreignkeycol='fk_p2_widget',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
+        back_populates='widget',
+        cascade='all',
         source_table='p2_widget',
         target_table='p2_span',
         post_update=False,
+        source_model='p2_widget',
+        target_model='p2_span',
         )
 
     # span[fk] -> widget (backref)
     result = insert_linkage(
-                             attr_name='widget',
-                             foreignkeycol='fk_p2_widget',
-                             source_classname='SpanType',
-                             source_module='p2.datashackle.management.span.span',
-                             target_module='p2.datashackle.management.widget.widget',
-                             target_classname='WidgetType',
-                             fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
-                             back_populates='spans',
-                             cascade='save-update, merge',
+        attr_name='widget',
+        foreignkeycol='fk_p2_widget',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
+        back_populates='spans',
+        cascade='save-update, merge',
         source_table='p2_span',
         target_table='p2_widget',
         post_update=False,
+        source_model='p2_span',
+        target_model='p2_widget',
         )
 
     
     
     # p2_span_fileupload -> p2_linkage
     migrate_engine.data['span_fileupload2linkage'] = insert_linkage(
-                             attr_name='linkage',
-                             foreignkeycol='fk_p2_linkage',
-                             source_module='p2.datashackle.management.span.fileupload',
-                             source_classname='Fileupload',
-                             target_classname='Linkage',
-                             target_module='p2.datashackle.core.models.linkage',
-                             fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
-                             cascade='all',
+        attr_name='linkage',
+        foreignkeycol='fk_p2_linkage',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
+        cascade='all',
         source_table='p2_span_fileupload',
         target_table='p2_linkage',
         post_update=False,
+        source_model='p2_span_fileupload',
+        target_model='p2_linkage',
     )
 
 
@@ -792,18 +845,16 @@ def upgrade(migrate_engine):
     
     # 3. Linkage p2_span_fileupload -> p2_relation
     linkage_id = insert_linkage(
-                             attr_name='relation',
-                             foreignkeycol='fk_p2_relation',
-                             source_module='p2.datashackle.management.span.fileupload',
-                             source_classname='Fileupload',
-                             target_classname='Relation',
-                             target_module='p2.datashackle.core.models.relation',
-                             fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
-                             cascade='all',
-                             back_populates=None,
+        attr_name='relation',
+        foreignkeycol='fk_p2_relation',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
+        cascade='all',
+        back_populates=None,
         source_table='p2_span_fileupload',
         target_table='p2_relation',
         post_update=False,
+        source_model='p2_span_fileupload',
+        target_model='p2_relation',
     )
     
     # 4. Wrapper form on p2_span_fileupload to p2_relation
@@ -1180,16 +1231,14 @@ def upgrade(migrate_engine):
         attr_name='linkage',
         ref_key=None,
         foreignkeycol='fk_p2_linkage',
-        source_module='p2.datashackle.management.span.embeddedform',
-        source_classname='EmbeddedForm',
-        target_classname='Linkage',
-        target_module='p2.datashackle.core.models.linkage',
         fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
         cascade='all',
         source_table='p2_span_embeddedform',
         target_table='p2_linkage',
         post_update=False,
-        back_populates=None
+        back_populates=None,
+        source_model='p2_span_embeddedform',
+        target_model='p2_linkage',
     )
     
     # 3. Create properties_linkage form on p2_linkage
@@ -1220,16 +1269,14 @@ def upgrade(migrate_engine):
     linkage_id = insert_linkage(
         attr_name='relation',
         foreignkeycol='fk_p2_relation',
-        source_module='p2.datashackle.core.models.linkage',
-        source_classname='Linkage',
         source_table='p2_linkage',
-        target_module='p2.datashackle.core.models.relation',
-        target_classname='Relation',
         target_table='p2_relation',
         fk_p2_cardinality=migrate_engine.data['cardinalities']['1(fk):1'],
         cascade='all',
         back_populates=None,
         post_update=False,
+        source_model='p2_linkage',
+        target_model='p2_relation',
     )
 
     # 5. Create container for indirect controls [xref_table, foreignkeycol, foreignkeycol2] 
@@ -1321,46 +1368,43 @@ def upgrade(migrate_engine):
         css=css_style
     )
     
-    linkage_id = insert_linkage(
-        attr_name='dummy_embeddedform_archetype',
-        foreignkeycol='',
-        source_module='',
-        source_classname='',
-        target_classname='',
-        target_module='',
-        fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
-        cascade='',
-        source_table='dummy_embeddedform_archetype',
-        target_table='',
-        back_populates=None,
-        post_update=False
-    )
-    data.p2_span_embeddedform.insert().execute(span_identifier=identifier,
-        fk_p2_linkage=linkage_id, cardinality='1,1'
-    )
+    #linkage_id = insert_linkage(
+    #    attr_name='dummy_embeddedform_archetype',
+    #    foreignkeycol='',
+    #    fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
+    #    cascade='',
+    #    source_table='dummy_embeddedform_archetype',
+    #    target_table='',
+    #    back_populates=None,
+    #    post_update=False,
+    #    source_model='p2_plan',
+    #    target_model='p2_plan',
+    #)
+    #data.p2_span_embeddedform.insert().execute(span_identifier=identifier,
+    #    fk_p2_linkage=linkage_id, cardinality='1,1'
+    #)
 
     # 
     # Dropdown
     #
-    result = data.p2_plan.insert().execute(plan_identifier='p2_span_dropdown',
-                             so_module='p2.datashackle.management.span.dropdown',
-                             so_type='Dropdown')
+    result = data.p2_plan.insert().execute(
+                             plan_identifier='p2_span_dropdown',
+                             klass='Dropdown',
+                             table='p2_span_dropdown')
     dropdown_plan_id = result.inserted_primary_key[0]
     
     # p2_span_dropdown -> p2_linkage
     linkage_id = insert_linkage(
                              attr_name='linkage',
                              foreignkeycol='fk_p2_linkage',
-                             source_module='p2.datashackle.management.span.dropdown',
-                             source_classname='Dropdown',
-                             target_classname='Linkage',
-                             target_module='p2.datashackle.core.models.linkage',
                              fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
                              cascade='all',
                              source_table='p2_span_dropdown',
                              target_table='p2_linkage',
                              back_populates=None,
-                             post_update=False
+                             post_update=False,
+                             source_model='p2_span_dropdown',
+                             target_model='p2_linkage',
                              )
     
     #
@@ -1518,23 +1562,21 @@ def upgrade(migrate_engine):
         css=css_style
     )
 
-    linkage_id = insert_linkage(
-        attr_name='dummy_dropdown_archetype',
-        foreignkeycol='',
-        source_module='',
-        source_classname='',
-        target_classname='',
-        target_module='',
-        fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
-        cascade='',
-        source_table='dummy_dropdown_archetype',
-        target_table='',
-        back_populates=None,
-        post_update=False
-    )
-    data.p2_span_dropdown.insert().execute(span_identifier=identifier,
-        fk_p2_linkage=linkage_id, cardinality='1,1'
-    )
+    #linkage_id = insert_linkage(
+    #    attr_name='dummy_dropdown_archetype',
+    #    foreignkeycol='',
+    #    fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
+    #    cascade='',
+    #    source_table='dummy_dropdown_archetype',
+    #    target_table='',
+    #    back_populates=None,
+    #    post_update=False,
+    #    source_model='p2_plan',
+    #    target_model='p2_plan',
+    #)
+    #data.p2_span_dropdown.insert().execute(span_identifier=identifier,
+    #    fk_p2_linkage=linkage_id, cardinality='1,1'
+    #)
 
 
     # Form for p2_plan
@@ -1547,10 +1589,7 @@ def upgrade(migrate_engine):
         'fk_default_form', None, tab_order=1, text_width=250
     )
     create_labeltext_widget(data, migrate_engine.data['p2_plan_form_id'],
-        0, 40, 'so_module', 'so_module', None, tab_order=2, text_width=250
-    )
-    create_labeltext_widget(data, migrate_engine.data['p2_plan_form_id'],
-        0, 60, 'Setobject class name', 'so_type', None, tab_order=3, text_width=250
+        0, 40, 'Setobject class name', 'klass', None, tab_order=3, text_width=250
     )
    
 
@@ -1671,7 +1710,33 @@ def upgrade(migrate_engine):
         defaultvalue="",
         tab_order=0
     )
-
+    
+    
+    linkage_id = insert_linkage(
+        attr_name='source_model',
+        foreignkeycol='fk_source_model',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['1(fk):1'],
+        cascade='all',
+        back_populates=None,
+        post_update=False,
+        source_table='p2_linkage',
+        source_model='p2_linkage',
+        target_table='p2_plan',
+        target_model='p2_plan',
+    )
+    
+    linkage_id = insert_linkage(
+        attr_name='target_model',
+        foreignkeycol='fk_target_model',
+        fk_p2_cardinality=migrate_engine.data['cardinalities']['1(fk):1'],
+        cascade='all',
+        back_populates=None,
+        post_update=False,
+        source_table='p2_linkage',
+        source_model='p2_linkage',
+        target_table='p2_plan',
+        target_model='p2_plan',
+    )
 
 def downgrade(migrate_engine):
     pass

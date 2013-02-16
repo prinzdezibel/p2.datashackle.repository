@@ -23,8 +23,8 @@ p2_plan = Table('p2_plan',
                 metadata,
                 Column('plan_identifier', String(length=255), primary_key=True, nullable=False, autoincrement=False),
                 Column('fk_default_form', String(10), index=True),
-                Column('so_module', String(255), nullable=False),
-                Column('so_type', String(255), nullable=False),
+                Column('klass', String(255), nullable=False),
+                Column('table', String(255), nullable=False),
                 mysql_engine='InnoDB',
                 )
 
@@ -92,14 +92,12 @@ p2_linkage = Table('p2_linkage',
              Column('id', String(10), primary_key=True, autoincrement=False),
              Column('attr_name', String(63), nullable=True),
              Column('ref_key', String(63), nullable=True),
-             Column('source_module', String(255), nullable=True),
-             Column('source_classname', String(255), nullable=True),
-             Column('target_module', String(255), nullable=True),
-             Column('target_classname', String(255), nullable=True),
              Column('back_populates', String(63), nullable=True),
              Column('cascade', String(255), nullable=True),
              Column('fk_p2_relation', ForeignKey('p2_relation.id', onupdate="CASCADE"), nullable=True),
              Column('post_update', Boolean), #http://www.sqlalchemy.org/docs/05/mappers.html#rows-that-point-to-themselves-mutually-dependent-rows
+             Column('fk_source_model', ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"), nullable=False),
+             Column('fk_target_model', ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"), nullable=False),
              mysql_engine='InnoDB')
 
 

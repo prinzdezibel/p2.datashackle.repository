@@ -40,8 +40,7 @@ def upgrade(migrate_engine):
         )
 
     p2_plan.insert().execute(plan_identifier='p2_cardinality',
-                             so_module='p2.datashackle.core.models.cardinality',
-                             so_type='Cardinality')
+                             klass='Cardinality', table='p2_cardinality')
     
 
 def downgrade(migrate_engine):
