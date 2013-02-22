@@ -23,8 +23,8 @@ p2_plan = Table('p2_plan',
                 metadata,
                 Column('plan_identifier', String(length=255), primary_key=True, nullable=False, autoincrement=False),
                 Column('fk_default_form', String(10), index=True),
-                Column('klass', String(255), nullable=False),
-                Column('table', String(255), nullable=False),
+                Column('klass', String(255), nullable=True, unique=True),
+                Column('table', String(255), nullable=True),
                 mysql_engine='InnoDB',
                 )
 
@@ -37,11 +37,12 @@ p2_form = Table('p2_form',
                 metadata,
                 Column('form_identifier', String(10), primary_key=True, autoincrement=False),
                 Column('form_name', String(63)),
-                Column('fk_p2_plan', ForeignKey('p2_plan.plan_identifier'), nullable=True),
+                Column('fk_p2_plan', 
+                       ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"),
+                       nullable=True),
                 Column('css', String(1023), nullable=False, default=''),
                 Column('fk_p2_formlayout',
-                       ForeignKey('p2_formlayout.id'),
-                       onupdate="CASCADE",
+                       ForeignKey('p2_formlayout.id', onupdate="CASCADE"),
                        default='FORM'),
                 mysql_engine='InnoDB',
                 )
@@ -50,17 +51,16 @@ p2_widget = Table('p2_widget',
                 metadata,
                 Column('widget_identifier', String(10), primary_key=True, autoincrement=False),
                 Column('fk_p2_form', ForeignKey('p2_form.form_identifier')),
-                #Column('widget_type', String(63), nullable=False),
-                Column('widget_type', ForeignKey('p2_widget_type.id'),
-                       onupdate="CASCADE"),
+                Column('widget_type', ForeignKey('p2_plan.klass', onupdate="CASCADE")),
                 Column('css', String(1023), nullable=False, default=''),
                 Column('tab_order', Integer, nullable=False, default=0),
+                Column('no_metaedit', Boolean, nullable=False, default=False),
                 mysql_engine='InnoDB',
                 )
 
-p2_widget_type = Table('p2_widget_type', metadata,
-                       Column('id', String(12), primary_key=True, autoincrement=False),
-                       mysql_engine='InnoDB')
+#p2_widget_type = Table('p2_widget_type', metadata,
+#                       Column('id', String(63), primary_key=True, autoincrement=False),
+#                       mysql_engine='InnoDB')
 
 p2_cardinality = Table('p2_cardinality',
    metadata,
@@ -84,7 +84,7 @@ p2_relation = Table('p2_relation',
              Column('source_table', String(255), nullable=True),
              Column('target_table', String(255), nullable=True),
              Column('xref_table', String(255), nullable=True),
-             Column('fk_p2_cardinality', ForeignKey('p2_cardinality.id'), onupdate="CASCADE", nullable=False),
+             Column('fk_p2_cardinality', ForeignKey('p2_cardinality.id'), nullable=False),
              mysql_engine='InnoDB')
 
 p2_linkage = Table('p2_linkage',
@@ -96,8 +96,8 @@ p2_linkage = Table('p2_linkage',
              Column('cascade', String(255), nullable=True),
              Column('fk_p2_relation', ForeignKey('p2_relation.id', onupdate="CASCADE"), nullable=True),
              Column('post_update', Boolean), #http://www.sqlalchemy.org/docs/05/mappers.html#rows-that-point-to-themselves-mutually-dependent-rows
-             Column('fk_source_model', ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"), nullable=False),
-             Column('fk_target_model', ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"), nullable=False),
+             Column('fk_source_model', ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"), nullable=True),
+             Column('fk_target_model', ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"), nullable=True),
              mysql_engine='InnoDB')
 
 
@@ -106,7 +106,7 @@ p2_span = Table('p2_span',
             Column('span_identifier', String(10)),
             Column('fk_p2_widget', ForeignKey('p2_widget.widget_identifier')),
             Column('span_name', String(63), index=True),
-            Column('span_type', String(63), nullable=False),
+            Column('span_type', ForeignKey('p2_plan.klass', onupdate="CASCADE")),
             Column('span_value', String(255), nullable=True),
             Column('css', String(1023), nullable=False, default=''),
             Column('visible', Boolean, nullable=True, default=True),
@@ -178,9 +178,13 @@ p2_span_fileupload = Table('p2_span_fileupload',
 # This table inherits all attributes from p2_span!
 p2_span_action = Table('p2_span_action',
                  metadata,
-                 Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True), # Joined table inheritance!
+                 Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
                  Column('msg_reset', Boolean, nullable=False, default=0),
                  Column('msg_close', Boolean, nullable=False, default=0),
+                 Column('submit', Boolean, nullable=False, default=False),
+                 Column('ajax', Boolean, nullable=True, default=0),
+                 Column('method', String(63), nullable=True),
+                 Column('aktion', String(63), nullable=True),
                  mysql_engine='InnoDB'
                  )
 
@@ -267,4 +271,4 @@ def downgrade(migrate_engine):
     p2_cardinality.drop()
     p2_country.drop()
     p2_formlayout.drop()
-    p2_widget_type.drop()
+    #p2_widget_type.drop()
