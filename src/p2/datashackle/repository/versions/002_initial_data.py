@@ -1532,9 +1532,8 @@ def upgrade(migrate_engine):
     )
 
     insStmt = data.p2_form.insert()
-    identifier = data.generate_random_identifier()
     css_style = "height:300px; width:230px;"
-    result = insStmt.execute(form_identifier=identifier,
+    result = insStmt.execute(form_identifier='default_form',
                              form_name="default_form",
                              fk_p2_plan="p2_archetype",
                              css=css_style)
@@ -1639,69 +1638,67 @@ def upgrade(migrate_engine):
 
     # "manage flow layout" form. For managing forms that have document flow (floating)
     # e.g. tree or list layouted forms.
-    form_id = data.generate_random_identifier()
-    result = data.p2_form.insert().execute(
-        form_identifier=form_id,
-        form_name="manage_flow_formlayout",
-        fk_p2_plan='p2_form',
-        css="height:40px; width:400px;"
-    )
-    create_embeddedform_widget(data, form_id, 0, 0,
-                               labeltext="form -> widget",
-                               linkage_id=migrate_engine.data['form_widget_linkage'],
-                               form_name="manage_flow_formlayout_embedded_1",
-                               plan_identifier="p2_widget",
-                               label_visible=False, # we don't want to display the label,
-                               filter_clause='',
-                               tab_order=0,
-                               )
+    #form_id = data.generate_random_identifier()
+    #result = data.p2_form.insert().execute(
+    #    form_identifier=form_id,
+    #    form_name="manage_flow_formlayout",
+    #    fk_p2_plan='p2_form',
+    #    css="height:40px; width:400px;"
+    #)
+    #create_embeddedform_widget(data, form_id, 0, 0,
+    #                           labeltext="form -> widget",
+    #                           linkage_id=migrate_engine.data['form_widget_linkage'],
+    #                           form_name="manage_flow_formlayout_embedded_1",
+    #                           plan_identifier="p2_widget",
+    #                           label_visible=False, # we don't want to display the label,
+    #                           filter_clause='',
+    #                           tab_order=0,
+    #                           )
 
-    form_id = data.generate_random_identifier()
-    result = data.p2_form.insert().execute(
-        form_identifier=form_id,
-        form_name='manage_flow_formlayout_embedded_1',
-        fk_p2_plan='p2_widget',
-        css="height:40px; width:400px;")
-       
-    form_name = 'manage_flow_formlayout_embedded_1_1'
-    create_embeddedform_widget(data, form_id, 0, 0,
-                               labeltext="widget to span form",
-                               linkage_id=migrate_engine.data['widget_span_linkage'],
-                               form_name=form_name,
-                               plan_identifier="p2_span",
-                               label_visible=False,
-                               filter_clause='p2_span.span_name="label"',
-                               tab_order=0,
-                               )
+    #form_id = data.generate_random_identifier()
+    #result = data.p2_form.insert().execute(
+    #    form_identifier=form_id,
+    #    form_name='manage_flow_formlayout_embedded_1',
+    #    fk_p2_plan='p2_widget',
+    #    css="height:40px; width:400px;")
+    #   
+    #form_name = 'manage_flow_formlayout_embedded_1_1'
+    #create_embeddedform_widget(data, form_id, 0, 0,
+    #                           labeltext="widget to span form",
+    #                           linkage_id=migrate_engine.data['widget_span_linkage'],
+    #                           form_name=form_name,
+    #                           plan_identifier="p2_span",
+    #                           label_visible=False,
+    #                           filter_clause='p2_span.span_name="label"',
+    #                           tab_order=0,
+    #                           )
 
-    create_dropdown_widget(form_id, 0, 20,
-            'Widget type', # label
-            'widget_type', # foreignkeycol
-            '_widget_type', # the mapped attribute
-            #'p2_widget_type', # target_plan
-            'p2_plan', # target_plan
-            'id', # the attribute that is shown in the dropdown list 
-            True, # required
-            1, # tab_order,
-            'p2_widget', # source_table,
-            #'p2_widget_type' # target_table
-            'p2_plan' #target_table
-        )
+    #create_dropdown_widget(form_id, 0, 20,
+    #        'Widget type', # label
+    #        'widget_type', # foreignkeycol
+    #        '_widget_type', # the mapped attribute
+    #        'p2_plan', # target_plan
+    #        'id', # the attribute that is shown in the dropdown list 
+    #        True, # required
+    #        1, # tab_order,
+    #        'p2_widget', # source_table,
+    #        'p2_plan' #target_table
+    #    )
     
 
-    plan_id = 'p2_span'
-    form_id = u32_hash(plan_id, form_name)
-    result = data.p2_form.insert().execute(
-        form_identifier=form_id,
-        form_name=form_name,
-        fk_p2_plan=plan_id,
-        css="height:40px; width:400px;")
+    #plan_id = 'p2_span'
+    #form_id = u32_hash(plan_id, form_name)
+    #result = data.p2_form.insert().execute(
+    #    form_identifier=form_id,
+    #    form_name=form_name,
+    #    fk_p2_plan=plan_id,
+    #    css="height:40px; width:400px;")
 
-    create_labeltext_widget(data, form_id, 0, 0,
-        labeltext="Name", field_identifier="span_value",
-        defaultvalue="",
-        tab_order=0
-    )
+    #create_labeltext_widget(data, form_id, 0, 0,
+    #    labeltext="Name", field_identifier="span_value",
+    #    defaultvalue="",
+    #    tab_order=0
+    #)
     
     
     linkage_id = insert_linkage(
@@ -1751,9 +1748,8 @@ def upgrade(migrate_engine):
     )
 
     # Add model view:
-    identifier = data.generate_random_identifier()
     result = data.p2_form.insert().execute(
-                             form_identifier=identifier,
+                             form_identifier='add_model_view',
                              form_name="add_model_view",
                              fk_p2_plan='p2_plan',
                              css="height:120px; width:310px;"

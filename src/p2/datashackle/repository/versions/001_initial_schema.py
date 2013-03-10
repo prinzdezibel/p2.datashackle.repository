@@ -35,7 +35,7 @@ p2_plan = Table('p2_plan',
 # 2 : tree layout (document flow)
 p2_form = Table('p2_form',
                 metadata,
-                Column('form_identifier', String(10), primary_key=True, autoincrement=False),
+                Column('form_identifier', String(16), primary_key=True, autoincrement=False),
                 Column('form_name', String(63)),
                 Column('fk_p2_plan', 
                        ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"),
