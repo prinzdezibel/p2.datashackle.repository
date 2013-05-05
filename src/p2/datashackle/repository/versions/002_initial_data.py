@@ -17,7 +17,7 @@ p2_span_checkbox = getattr(mod, 'p2_span_checkbox')
 p2_span_embeddedform = getattr(mod, 'p2_span_embeddedform')
 p2_span_action = getattr(mod, 'p2_span_action')
 p2_span_dropdown = getattr(mod, 'p2_span_dropdown')
-p2_embform_characteristic = getattr(mod, 'p2_embform_characteristic')
+#p2_embform_characteristic = getattr(mod, 'p2_embform_characteristic')
 p2_relation = getattr(mod, 'p2_relation')
 p2_formlayout = getattr(mod, 'p2_formlayout')
 
@@ -251,21 +251,21 @@ def create_checkbox_widget(data, form_id, labeltext, x, y, field_identifier, def
 
 
 
-def upgrade_p2_embform_characteristic(migrate_engine):
-    #migrate_engine.data['cardinalities'] = cardinalitydict = {
-    recs = (
-        ('ADJACENCY_LIST', 'Tree hierarchy'),
-        ('LIST', 'List'),
-    )
-    for rec in recs:
-        p2_embform_characteristic.insert().execute(
-            id=rec[0],
-            title=rec[1]
-        )
-
-    p2_plan.insert().execute(plan_identifier='p2_embform_characteristic',
-                             klass='p2_embform_characteristic',
-                             table='p2_embform_characteristic')
+#def upgrade_p2_embform_characteristic(migrate_engine):
+#    #migrate_engine.data['cardinalities'] = cardinalitydict = {
+#    recs = (
+#        ('ADJACENCY_LIST', 'Tree hierarchy'),
+#        ('LIST', 'List'),
+#    )
+#    for rec in recs:
+#        p2_embform_characteristic.insert().execute(
+#            id=rec[0],
+#            title=rec[1]
+#        )
+#
+#    p2_plan.insert().execute(plan_identifier='p2_embform_characteristic',
+#                             klass='p2_embform_characteristic',
+#                             table='p2_embform_characteristic')
     
 def insert_p2_formlayout_records():
     recs = (
@@ -298,7 +298,7 @@ def upgrade(migrate_engine):
     data.p2_span_checkbox = getattr(mod, 'p2_span_checkbox')
     data.p2_span_dropdown = getattr(mod, 'p2_span_dropdown')
 
-    upgrade_p2_embform_characteristic(migrate_engine)
+    #upgrade_p2_embform_characteristic(migrate_engine)
     insert_p2_formlayout_records()
     #insert_p2_widget_type_records()
 
@@ -1122,7 +1122,7 @@ def upgrade(migrate_engine):
 
 
     # Label visible control
-    create_embeddedform_widget(data, form_id, 0, 260,
+    create_embeddedform_widget(data, form_id, 0, 220,
                                         labeltext="Labeltext widget -> label properties",
                                         linkage_id=migrate_engine.data['widget_span_linkage'],
                                         form_name="properties_label",
@@ -1132,7 +1132,7 @@ def upgrade(migrate_engine):
                                         tab_order=4,
                                         )
     
-    create_labeltext_widget(data, form_id, 0, 280, labeltext="Tab order", field_identifier="tab_order", defaultvalue="0", tab_order=3)
+    create_labeltext_widget(data, form_id, 0, 240, labeltext="Tab order", field_identifier="tab_order", defaultvalue="0", tab_order=3)
     insert_save_button(data, form_id, tab_order=4)
     insert_reset_button(data, form_id, tab_order=5)
 
@@ -1175,36 +1175,37 @@ def upgrade(migrate_engine):
     )
     
    
-    create_dropdown_widget(
-        form_id,
-        0,
-        20,
-        'Form characteristic',
-        'fk_characteristic',
-        'characteristic',
-        'p2_embform_characteristic',
-        'title',
-        False,
-        tab_order=1,
-        source_table='p2_span_embeddedform',
-        target_table='p2_embform_characteristic',
-    )
+    #create_dropdown_widget(
+    #    form_id,
+    #    0,
+    #    20,
+    #    'Form characteristic',
+    #    'fk_characteristic',
+    #    'characteristic',
+    #    'p2_embform_characteristic',
+    #    'title',
+    #    False,
+    #    tab_order=1,
+    #    source_table='p2_span_embeddedform',
+    #    target_table='p2_embform_characteristic',
+    #)
+    
+    # adjacency linkage id
+    #create_labeltext_widget(data, form_id, 0, 40,
+    #    labeltext="Tree linkage id", field_identifier="adjacency_linkage",
+    #    defaultvalue="", tab_order=3, required=False
+    #)
     
     create_checkbox_widget(data,
           form_id,
           labeltext="Editable",
           x=0,
-          y=40,
+          y=20,
           field_identifier="editable",
           default=True,
           tab_order=2,
           )
 
-    # adjacency linkage id
-    create_labeltext_widget(data, form_id, 0, 60,
-        labeltext="Tree linkage id", field_identifier="adjacency_linkage",
-        defaultvalue="", tab_order=3, required=False
-    )
  
     # =======================================================================
     # attr_name [xref_table, foreignkeycol, foreignkeycol2] 
@@ -1538,32 +1539,9 @@ def upgrade(migrate_engine):
                              fk_p2_plan="p2_archetype",
                              css=css_style)
     form_id = result.inserted_primary_key[0]
-    
-    insStmt = p2_widget.insert()
-    identifier = data.generate_random_identifier()
-    result = insStmt.execute(widget_identifier=identifier,
-                             widget_type="ActionWidget",
-                             fk_p2_form=form_id,
-                             tab_order=0,
-                             css='position: absolute; bottom:-10px;',
-                             no_metaedit=True)
-    last_inserted_widget_id = result.inserted_primary_key[0]
-    
-    insStmt = p2_span.insert()
-    span_identifier = data.generate_random_identifier()
-    result = insStmt.execute(fk_p2_widget=last_inserted_widget_id,
-                         span_identifier=span_identifier,
-                         span_name="button",
-                         span_type="Action",
-                         span_value="Save",
-                         css="width:60px") 
-    p2_span_action.insert().execute(span_identifier=span_identifier,
-                                    msg_reset=False,
-                                    msg_close=True,
-                                    submit=True,
-                                    method='POST',
-                                    ajax=True,
-                                    aktion='save')
+   
+
+
 
 
 

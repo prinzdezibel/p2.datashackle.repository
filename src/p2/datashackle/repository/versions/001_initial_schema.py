@@ -54,7 +54,6 @@ p2_widget = Table('p2_widget',
                 Column('widget_type', ForeignKey('p2_plan.klass', onupdate="CASCADE")),
                 Column('css', String(1023), nullable=False, default=''),
                 Column('tab_order', Integer, nullable=False, default=0),
-                Column('no_metaedit', Boolean, nullable=False, default=False),
                 mysql_engine='InnoDB',
                 )
 
@@ -69,12 +68,12 @@ p2_cardinality = Table('p2_cardinality',
    mysql_engine='InnoDB',
 )
 
-p2_embform_characteristic = Table('p2_embform_characteristic',
-   metadata,
-   Column('id', String(length=32), primary_key=True, nullable=False, autoincrement=False),
-   Column('title', String(64), nullable=False),
-   mysql_engine='InnoDB',
-)
+#p2_embform_characteristic = Table('p2_embform_characteristic',
+#   metadata,
+#   Column('id', String(length=32), primary_key=True, nullable=False, autoincrement=False),
+#   Column('title', String(64), nullable=False),
+#   mysql_engine='InnoDB',
+#)
 
 p2_relation = Table('p2_relation',
              metadata,
@@ -161,8 +160,8 @@ p2_span_embeddedform = Table('p2_span_embeddedform',
                  Column('filter_clause', String(255), nullable=True),
                  Column('editable', Boolean, default=True),
                  Column('fk_p2_linkage', ForeignKey('p2_linkage.id', onupdate="CASCADE"), nullable=True),
-                 Column('fk_characteristic', ForeignKey('p2_embform_characteristic.id', onupdate="CASCADE"), nullable=False, default="LIST"),
-                 Column('adjacency_linkage', String(10), nullable=True),
+                 #Column('fk_characteristic', ForeignKey('p2_embform_characteristic.id', onupdate="CASCADE"), nullable=False, default="LIST"),
+                 #Column('adjacency_linkage', String(10), nullable=True),
                  mysql_engine='InnoDB'
                  )
 
@@ -261,7 +260,7 @@ def downgrade(migrate_engine):
     p2_span_embeddedform.drop(migrate_engine)
     p2_linkage.drop(migrate_engine)
     p2_relation.drop(migrate_engine) 
-    p2_embform_characteristic.drop(migrate_engine)
+    #p2_embform_characteristic.drop(migrate_engine)
     p2_span.drop(migrate_engine)
     p2_archetype.drop(migrate_engine)
     p2_widget.drop(migrate_engine)
