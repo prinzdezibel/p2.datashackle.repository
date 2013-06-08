@@ -178,11 +178,6 @@ p2_span_fileupload = Table('p2_span_fileupload',
 p2_span_action = Table('p2_span_action',
                  metadata,
                  Column('span_identifier', String(10), ForeignKey('p2_span.span_identifier', onupdate="CASCADE"), primary_key=True),
-                 Column('msg_reset', Boolean, nullable=False, default=0),
-                 Column('msg_close', Boolean, nullable=False, default=0),
-                 Column('submit', Boolean, nullable=False, default=False),
-                 Column('ajax', Boolean, nullable=True, default=0),
-                 Column('method', String(63), nullable=True),
                  Column('aktion', String(63), nullable=True),
                  mysql_engine='InnoDB'
                  )

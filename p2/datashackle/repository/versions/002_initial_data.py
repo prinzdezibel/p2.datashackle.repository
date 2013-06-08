@@ -112,41 +112,12 @@ def insert_save_button(data, form_id, tab_order):
                          span_name="button",
                          span_type="Action",
                          span_value="OK",
-        css="width:60px"
+                         css="width:60px"
     ) 
 
     p2_span_action.insert().execute(span_identifier=span_identifier,
-                                         msg_reset=False,
-                                         msg_close=True
-                                         )
+                                    aktion='close')
 
-def insert_reset_button(data, form_id, tab_order):    
-    # Insert Reset Action widget into form
-    css_style="position: absolute; top: 280px; left: 105px;"
-    insStmt = p2_widget.insert()
-    identifier = data.generate_random_identifier()
-    result = insStmt.execute(widget_identifier=identifier,
-                          widget_type="ActionWidget",
-                          fk_p2_form=form_id,
-                          tab_order=tab_order,
-        css=css_style
-    )
-    last_inserted_widget_id = result.inserted_primary_key[0]
-
-    # Button span
-    span_identifier = data.generate_random_identifier()
-    result = p2_span.insert().execute(fk_p2_widget=last_inserted_widget_id,
-        span_identifier=span_identifier,
-        span_name="button",
-        span_type="Action",
-        span_value="Reset",
-        css="width:60px;"
-    )
-
-    p2_span_action.insert().execute(span_identifier=span_identifier,
-                                         msg_reset=True,
-                                         msg_close=False
-                                         )
  
 
 def create_embeddedform_widget(data, form_id, xpos, ypos, labeltext, linkage_id, form_name,
@@ -467,8 +438,8 @@ def upgrade(migrate_engine):
                              klass='Cardinality', table='p2_cardinality')
     p2_plan.insert().execute(plan_identifier='p2_plan',
                              klass='Plan', table='p2_plan')
-    p2_plan.insert().execute(plan_identifier='Model',
-                             klass='Model', table='p2_plan')
+    p2_plan.insert().execute(plan_identifier='StrippedModel',
+                             klass='StrippedModel', table='p2_plan')
     p2_plan.insert().execute(plan_identifier='p2_media',
                              klass='Media', table='p2_media')
     p2_plan.insert().execute(plan_identifier='Label',
@@ -716,7 +687,6 @@ def upgrade(migrate_engine):
     create_labeltext_widget(data, labeltext_form_id, 0, 125, labeltext="Tab order", field_identifier="tab_order", defaultvalue="0", tab_order=2)
 
     insert_save_button(data, labeltext_form_id, tab_order=3)
-    insert_reset_button(data, labeltext_form_id, tab_order=4)
     
 
     # Properties label span            
@@ -939,7 +909,6 @@ def upgrade(migrate_engine):
                              )
     
     insert_save_button(data, propertyform_id, tab_order=3)
-    insert_reset_button(data, propertyform_id, tab_order=4)
     
 
     #                    
@@ -1015,7 +984,6 @@ def upgrade(migrate_engine):
                                         )
     create_labeltext_widget(data, form_id, 0, 65, 'Tab order', 'tab_order', None, tab_order=2)
     insert_save_button(data, form_id, tab_order=3)
-    insert_reset_button(data, form_id, tab_order=4)
    
 
     # Properties checkbox span
@@ -1134,7 +1102,6 @@ def upgrade(migrate_engine):
     
     create_labeltext_widget(data, form_id, 0, 240, labeltext="Tab order", field_identifier="tab_order", defaultvalue="0", tab_order=3)
     insert_save_button(data, form_id, tab_order=4)
-    insert_reset_button(data, form_id, tab_order=5)
 
 
 
@@ -1425,7 +1392,6 @@ def upgrade(migrate_engine):
         tab_order=3,
     )
     insert_save_button(data, form_id, tab_order=4)
-    insert_reset_button(data, form_id, tab_order=5)
 
 
     # Property forms for dropdown widget
@@ -1678,32 +1644,32 @@ def upgrade(migrate_engine):
     #    tab_order=0
     #)
     
-    
-    linkage_id = insert_linkage(
-        attr_name='source_model',
-        foreignkeycol='fk_source_model',
-        fk_p2_cardinality=migrate_engine.data['cardinalities']['1(fk):1'],
-        cascade='all',
-        back_populates=None,
-        post_update=False,
-        source_table='p2_linkage',
-        source_model='p2_linkage',
-        target_table='p2_plan',
-        target_model='p2_plan',
-    )
-    
-    linkage_id = insert_linkage(
-        attr_name='target_model',
-        foreignkeycol='fk_target_model',
-        fk_p2_cardinality=migrate_engine.data['cardinalities']['1(fk):1'],
-        cascade='all',
-        back_populates=None,
-        post_update=False,
-        source_table='p2_linkage',
-        source_model='p2_linkage',
-        target_table='p2_plan',
-        target_model='p2_plan',
-    )
+
+    # linkage_id = insert_linkage(
+    #     attr_name='source_model',
+    #     foreignkeycol='fk_source_model',
+    #     fk_p2_cardinality=migrate_engine.data['cardinalities']['1(fk):1'],
+    #     cascade='all',
+    #     back_populates=None,
+    #     post_update=False,
+    #     source_table='p2_linkage',
+    #     source_model='p2_linkage',
+    #     target_table='p2_plan',
+    #     target_model='p2_plan',
+    # )
+    #
+    # linkage_id = insert_linkage(
+    #     attr_name='target_model',
+    #     foreignkeycol='fk_target_model',
+    #     fk_p2_cardinality=migrate_engine.data['cardinalities']['1(fk):1'],
+    #     cascade='all',
+    #     back_populates=None,
+    #     post_update=False,
+    #     source_table='p2_linkage',
+    #     source_model='p2_linkage',
+    #     target_table='p2_plan',
+    #     target_model='p2_plan',
+    # )
     
     # Countries
     p2_country.insert().execute(
@@ -1769,11 +1735,6 @@ def upgrade(migrate_engine):
                          css="width:100px") 
 
     p2_span_action.insert().execute(span_identifier=span_identifier,
-                                    msg_reset=False,
-                                    msg_close=False,
-                                    method='POST',
-                                    ajax=False,
-                                    submit=True,
                                     aktion='add')
 
 def downgrade(migrate_engine):
