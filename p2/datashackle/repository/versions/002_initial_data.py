@@ -8,7 +8,7 @@ p2_cardinality = getattr(mod, 'p2_cardinality')
 p2_country = getattr(mod, 'p2_country')
 p2_fieldtype = getattr(mod, 'p2_fieldtype')
 p2_widget = getattr(mod, 'p2_widget')
-p2_plan = getattr(mod, 'p2_plan')
+p2_model = getattr(mod, 'p2_model')
 p2_form = getattr(mod, 'p2_form')
 p2_linkage = getattr(mod, 'p2_linkage')
 p2_span = getattr(mod, 'p2_span')
@@ -234,7 +234,7 @@ def create_checkbox_widget(data, form_id, labeltext, x, y, field_identifier, def
 #            title=rec[1]
 #        )
 #
-#    p2_plan.insert().execute(plan_identifier='p2_embform_characteristic',
+#    p2_model.insert().execute(plan_identifier='p2_embform_characteristic',
 #                             klass='p2_embform_characteristic',
 #                             table='p2_embform_characteristic')
     
@@ -250,14 +250,14 @@ def insert_p2_formlayout_records():
             name=rec[1]
         )
 
-    p2_plan.insert().execute(plan_identifier='p2_formlayout',
+    p2_model.insert().execute(plan_identifier='p2_formlayout',
                              klass='p2_formlayout', table="p2_formlayout")
 
 
 
 def upgrade(migrate_engine):
     data = mod.upgradedataobj()
-    data.p2_plan = getattr(mod, 'p2_plan')
+    data.p2_model = getattr(mod, 'p2_model')
     data.p2_form = getattr(mod, 'p2_form')
     data.p2_widget = getattr(mod, 'p2_widget')
     data.p2_span = getattr(mod, 'p2_span')
@@ -287,8 +287,8 @@ def upgrade(migrate_engine):
             source_table,
             target_table
         ):
-        (source_model,) = select([p2_plan.c.plan_identifier],
-            and_(p2_form.c.fk_p2_plan == p2_plan.c.plan_identifier,
+        (source_model,) = select([p2_model.c.plan_identifier],
+            and_(p2_form.c.fk_p2_model == p2_model.c.plan_identifier,
                  p2_form.c.form_identifier == form_id)).execute().fetchone()
         target_model=target_plan
 
@@ -352,7 +352,7 @@ def upgrade(migrate_engine):
 
     # --- ARCHETYPE FORM ---
     
-    insStmt = data.p2_plan.insert()
+    insStmt = data.p2_model.insert()
     result = insStmt.execute(plan_identifier='p2_archetype',   
                              klass='p2_archetype', table='p2_archetype')
     last_inserted_id = result.inserted_primary_key[0]
@@ -364,7 +364,7 @@ def upgrade(migrate_engine):
     result = insStmt.execute(
                          form_identifier=identifier,
                          form_name="archetypes",
-                         fk_p2_plan=last_inserted_id,
+                         fk_p2_model=last_inserted_id,
         css=css_style
     )
     last_inserted_id = result.inserted_primary_key[0]
@@ -402,7 +402,7 @@ def upgrade(migrate_engine):
          
 ###############################################################################
 ###############################################################################
-    p2_plan.insert().execute(plan_identifier='p2_fieldtype',
+    p2_model.insert().execute(plan_identifier='p2_fieldtype',
                              klass='p2_fieldtype', table='p2_fieldtype')
 
     p2_fieldtype.insert().execute(
@@ -434,86 +434,86 @@ def upgrade(migrate_engine):
         )
 
 
-    p2_plan.insert().execute(plan_identifier='p2_cardinality',
+    p2_model.insert().execute(plan_identifier='p2_cardinality',
                              klass='Cardinality', table='p2_cardinality')
-    p2_plan.insert().execute(plan_identifier='p2_plan',
-                             klass='Plan', table='p2_plan')
-    p2_plan.insert().execute(plan_identifier='StrippedModel',
-                             klass='StrippedModel', table='p2_plan')
-    p2_plan.insert().execute(plan_identifier='p2_media',
+    p2_model.insert().execute(plan_identifier='p2_model',
+                             klass='Model', table='p2_model')
+    p2_model.insert().execute(plan_identifier='StrippedModel',
+                             klass='StrippedModel', table='p2_model')
+    p2_model.insert().execute(plan_identifier='p2_media',
                              klass='Media', table='p2_media')
-    p2_plan.insert().execute(plan_identifier='Label',
+    p2_model.insert().execute(plan_identifier='Label',
                              klass='Label', table='p2_span')
-    p2_plan.insert().execute(plan_identifier='ActionWidget',
+    p2_model.insert().execute(plan_identifier='ActionWidget',
                              klass='ActionWidget', table='p2_widget')
-    p2_plan.insert().execute(plan_identifier='DropdownWidget',
+    p2_model.insert().execute(plan_identifier='DropdownWidget',
                              klass='DropdownWidget', table='p2_widget')
-    p2_plan.insert().execute(plan_identifier='CheckboxWidget',
+    p2_model.insert().execute(plan_identifier='CheckboxWidget',
                              klass='CheckboxWidget', table='p2_widget')
-    p2_plan.insert().execute(plan_identifier='EmbeddedFormWidget',
+    p2_model.insert().execute(plan_identifier='EmbeddedFormWidget',
                              klass='EmbeddedFormWidget', table='p2_widget')
-    p2_plan.insert().execute(plan_identifier='FileuploadWidget',
+    p2_model.insert().execute(plan_identifier='FileuploadWidget',
                              klass='FileuploadWidget', table='p2_widget')
-    p2_plan.insert().execute(plan_identifier='Labeltext',
+    p2_model.insert().execute(plan_identifier='Labeltext',
                              klass='Labeltext', table='p2_widget')
     relation_plan_id = 'p2_relation'
-    result = p2_plan.insert().execute(plan_identifier=relation_plan_id,
+    result = p2_model.insert().execute(plan_identifier=relation_plan_id,
                              klass='Relation', table='p2_relation')
     p2_relation_plan_id = result.inserted_primary_key[0]
     
 
     # Widget plan
-    insStmt = p2_plan.insert()
+    insStmt = p2_model.insert()
     result = insStmt.execute(plan_identifier='p2_widget',
                              klass='WidgetType', table="p2_widget")
     p2_widget_plan_id = result.inserted_primary_key[0]
 
     # Span plan
-    insStmt = p2_plan.insert()
+    insStmt = p2_model.insert()
     result = insStmt.execute(plan_identifier='p2_span',
                              klass='SpanType', table='p2_span')
     p2_span_plan_id = result.inserted_primary_key[0]
 
     #EmbeddedformSpan plan
-    insStmt = p2_plan.insert()
+    insStmt = p2_model.insert()
     result = insStmt.execute(plan_identifier='p2_span_embeddedform',
                              klass='EmbeddedForm', table='p2_span_embeddedform')
     embeddedform_span_plan_id = result.inserted_primary_key[0]
 
     # FileuploadSpan plan
-    insStmt = p2_plan.insert()
+    insStmt = p2_model.insert()
     result = insStmt.execute(plan_identifier='p2_span_fileupload',
                              klass='Fileupload', table='p2_span_fileupload')
     p2_fileupload_span_plan_id = result.inserted_primary_key[0]
 
-    insStmt = p2_plan.insert()
+    insStmt = p2_model.insert()
     result = insStmt.execute(plan_identifier='p2_span_dropdown',
                              klass='Dropdown', table='p2_span_dropdown')
     
 
     # ActionSpan plan
-    result = p2_plan.insert().execute(plan_identifier='p2_span_action',
+    result = p2_model.insert().execute(plan_identifier='p2_span_action',
                              klass='Action', table='p2_span_action')
     action_span_plan_id = result.inserted_primary_key[0]
     
     # Alphanumeric plan
-    result = p2_plan.insert().execute(plan_identifier='p2_span_alphanumeric',
+    result = p2_model.insert().execute(plan_identifier='p2_span_alphanumeric',
                              klass='Alphanumeric', table='p2_span_alphanumeric')
     
     # Checkbox plan
-    result = p2_plan.insert().execute(plan_identifier='p2_span_checkbox',
+    result = p2_model.insert().execute(plan_identifier='p2_span_checkbox',
                              klass='Checkbox', table='p2_span_checkbox')
     checkbox_span_plan_id = result.inserted_primary_key[0]
 
     
     
-    p2_plan.insert().execute(plan_identifier='p2_countries',
+    p2_model.insert().execute(plan_identifier='p2_countries',
                              klass='p2_country', table='p2_country')
 
     # A plan that operates on p2_form
-    result = p2_plan.insert().execute(plan_identifier='p2_form',
+    result = p2_model.insert().execute(plan_identifier='p2_form',
                              klass='FormType', table='p2_form')
-    result = p2_plan.insert().execute(plan_identifier='p2_linkage',
+    result = p2_model.insert().execute(plan_identifier='p2_linkage',
                              klass='Linkage', table='p2_linkage')
     last_inserted_id = result.inserted_primary_key[0]
     p2_linkage_plan_id = last_inserted_id
@@ -523,14 +523,14 @@ def upgrade(migrate_engine):
     result = insStmt.execute(
                              form_identifier=identifier,
                              form_name="plans",
-                             fk_p2_plan='p2_plan',
+                             fk_p2_model='p2_model',
         css="height:80px; width:410px;"
     )
 
 
-    migrate_engine.data['p2_plan_form_id'] = result.inserted_primary_key[0]
-    p2_plan.update().where(p2_plan.c.plan_identifier == 'p2_plan').\
-        execute(fk_default_form=migrate_engine.data['p2_plan_form_id']) 
+    migrate_engine.data['p2_model_form_id'] = result.inserted_primary_key[0]
+    p2_model.update().where(p2_model.c.plan_identifier == 'p2_model').\
+        execute(fk_default_form=migrate_engine.data['p2_model_form_id'])
 
 
     # --- INITIAL LINKAGES ---
@@ -543,10 +543,10 @@ def upgrade(migrate_engine):
         fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
         cascade='save-update, merge',
         post_update=True, #http://www.sqlalchemy.org/docs/05/mappers.html#rows-that-point-to-themselves-mutually-dependent-rows
-        source_table='p2_plan',
+        source_table='p2_model',
         target_table='p2_form',
         back_populates=None,
-        source_model='p2_plan',
+        source_model='p2_model',
         target_model='p2_form',
         )
     
@@ -554,29 +554,29 @@ def upgrade(migrate_engine):
     result = insert_linkage(
          attr_name='forms',
          ref_key='form_name',
-         foreignkeycol='fk_p2_plan',
+         foreignkeycol='fk_p2_model',
          post_update=False,
          back_populates='plan',
          fk_p2_cardinality=migrate_engine.data['cardinalities']['1:n'],
          cascade='save-update, merge',
-         source_table='p2_plan',
+         source_table='p2_model',
          target_table='p2_form',
-         source_model='p2_plan',
+         source_model='p2_model',
          target_model='p2_form',
         )
     
     # plan -> forms[fk] (backref)
     result = insert_linkage(
         attr_name='plan',
-        foreignkeycol='fk_p2_plan',
+        foreignkeycol='fk_p2_model',
         back_populates='forms',
         fk_p2_cardinality=migrate_engine.data['cardinalities']['n:1'],
         cascade='all',
         source_table='p2_form',
-        target_table='p2_plan',
+        target_table='p2_model',
         post_update=False,
         source_model='p2_form',
-        target_model='p2_plan',
+        target_model='p2_model',
         )
                              
     # form -> widgets[fk]
@@ -660,7 +660,7 @@ def upgrade(migrate_engine):
     result = insStmt.execute(
                              form_identifier=identifier,
                              form_name="Labeltext",
-                             fk_p2_plan='p2_widget',
+                             fk_p2_model='p2_widget',
         css="height:310px; width:310px;"
     )
     
@@ -694,7 +694,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                          form_identifier=identifier,
                          form_name="properties_label",
-                         fk_p2_plan='p2_span',
+                         fk_p2_model='p2_span',
         css="height:20px; width:200px;"
     )
     
@@ -708,7 +708,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
         form_identifier=identifier,
         form_name="properties_alphanumeric",
-        fk_p2_plan='p2_span_alphanumeric',
+        fk_p2_model='p2_span_alphanumeric',
         css="height:100px; width:302px;"
     )
     properties_alphanumeric_id = result.inserted_primary_key[0]
@@ -789,7 +789,7 @@ def upgrade(migrate_engine):
     result = insStmt.execute(
                              form_identifier=identifier,
                              form_name="Fileupload",
-                             fk_p2_plan='p2_widget',
+                             fk_p2_model='p2_widget',
         css="height:320px; width:400px;")
     propertyform_id = result.inserted_primary_key[0]
     
@@ -820,7 +820,7 @@ def upgrade(migrate_engine):
     result = insStmt.execute(
                          form_identifier=identifier,
                          form_name="properties_linkage_fileupload",
-                         fk_p2_plan='p2_linkage',
+                         fk_p2_model='p2_linkage',
         css='height:20px; width:345px;'
     )
     form_id = result.inserted_primary_key[0]
@@ -846,7 +846,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="fileupload_relationproperties",
-                             fk_p2_plan='p2_span_fileupload',
+                             fk_p2_model='p2_span_fileupload',
         css="height:20px; width:350px;"
     )
     
@@ -877,7 +877,7 @@ def upgrade(migrate_engine):
     data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="fileupload_relationproperties",
-                             fk_p2_plan='p2_relation',
+                             fk_p2_model='p2_relation',
         css="height:20px; width:302px;"
     )
     
@@ -894,7 +894,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="properties_fileupload",
-                             fk_p2_plan='p2_span_fileupload',
+                             fk_p2_model='p2_span_fileupload',
         css="height:125px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -958,7 +958,7 @@ def upgrade(migrate_engine):
     result = insStmt.execute(
                              form_identifier=identifier,
                              form_name="CheckboxWidget",
-                             fk_p2_plan='p2_widget',
+                             fk_p2_model='p2_widget',
         css="height:310px; width:310px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -991,7 +991,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                          form_identifier=identifier,
                          form_name="properties_checkbox",
-                         fk_p2_plan='p2_span_checkbox',
+                         fk_p2_model='p2_span_checkbox',
         css="height:40px;width:302px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1052,7 +1052,7 @@ def upgrade(migrate_engine):
     identifier = data.generate_random_identifier()
     result = insStmt.execute(form_identifier=identifier,
                              form_name="EmbeddedFormWidget",
-                             fk_p2_plan='p2_widget',
+                             fk_p2_model='p2_widget',
         css="height:300px; width:400px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1109,7 +1109,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="target_form",
-                             fk_p2_plan='p2_span_embeddedform',
+                             fk_p2_model='p2_span_embeddedform',
         css="height:40px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1127,7 +1127,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="properties_embeddedform",
-                             fk_p2_plan='p2_span_embeddedform',
+                             fk_p2_model='p2_span_embeddedform',
         css="height:80px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1181,7 +1181,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="properties_linkage",
-                             fk_p2_plan='p2_span_embeddedform',
+                             fk_p2_model='p2_span_embeddedform',
         css="height:120px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1218,7 +1218,7 @@ def upgrade(migrate_engine):
     result = insStmt.execute(
                          form_identifier=identifier,
                          form_name="properties_linkage",
-                         fk_p2_plan='p2_linkage',
+                         fk_p2_model='p2_linkage',
         css="height:120px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1259,7 +1259,7 @@ def upgrade(migrate_engine):
     data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="properties_characteristic",
-                             fk_p2_plan='p2_relation',
+                             fk_p2_model='p2_relation',
         css="height:80px; width:350px;"
     )
     
@@ -1351,7 +1351,7 @@ def upgrade(migrate_engine):
     insStmt = data.p2_form.insert()
     result = insStmt.execute(form_identifier=identifier,
                              form_name="Dropdown",
-                             fk_p2_plan='p2_widget',
+                             fk_p2_model='p2_widget',
         css="height:300px; width:400px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1399,7 +1399,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="properties_dropdown",
-                             fk_p2_plan='p2_span_dropdown',
+                             fk_p2_model='p2_span_dropdown',
         css="height:100px; width:400px;"
      )
     form_id = result.inserted_primary_key[0]
@@ -1427,7 +1427,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                              form_identifier=identifier,
                              form_name="properties_dropdown_linkage",
-                             fk_p2_plan='p2_span_dropdown',
+                             fk_p2_model='p2_span_dropdown',
         css="height:45px; width:350px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1448,7 +1448,7 @@ def upgrade(migrate_engine):
     result = insStmt.execute(
                          form_identifier=identifier,
                          form_name="properties_dropdown_linkage",
-                         fk_p2_plan='p2_linkage',
+                         fk_p2_model='p2_linkage',
         css="height:40px; width:345px;"
     )
     form_id = result.inserted_primary_key[0]
@@ -1502,7 +1502,7 @@ def upgrade(migrate_engine):
     css_style = "height:300px; width:230px;"
     result = insStmt.execute(form_identifier='default_form',
                              form_name="default_form",
-                             fk_p2_plan="p2_archetype",
+                             fk_p2_model="p2_archetype",
                              css=css_style)
     form_id = result.inserted_primary_key[0]
    
@@ -1512,16 +1512,16 @@ def upgrade(migrate_engine):
 
 
 
-    # Form for p2_plan
+    # Form for p2_model
     create_labeltext_widget(
-        data, migrate_engine.data['p2_plan_form_id'], 0, 0, 'plan_identifier',
+        data, migrate_engine.data['p2_model_form_id'], 0, 0, 'plan_identifier',
         'plan_identifier', None, tab_order=0, text_width=250
     )
     create_labeltext_widget(
-        data, migrate_engine.data['p2_plan_form_id'], 0, 20, 'fk_default_form',
+        data, migrate_engine.data['p2_model_form_id'], 0, 20, 'fk_default_form',
         'fk_default_form', None, tab_order=1, text_width=250
     )
-    create_labeltext_widget(data, migrate_engine.data['p2_plan_form_id'],
+    create_labeltext_widget(data, migrate_engine.data['p2_model_form_id'],
         0, 40, 'Setobject class name', 'klass', None, tab_order=3, text_width=250
     )
    
@@ -1531,12 +1531,12 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
         form_identifier=identifier,
         form_name="default_form",
-        fk_p2_plan='p2_form',
+        fk_p2_model='p2_form',
         css="height:60px; width:400px;"
     )
 
-    stmt = p2_plan.update().values(fk_default_form=identifier).where(
-        p2_plan.c.plan_identifier == 'p2_form')
+    stmt = p2_model.update().values(fk_default_form=identifier).where(
+        p2_model.c.plan_identifier == 'p2_form')
     stmt.execute()
 
     
@@ -1549,7 +1549,7 @@ def upgrade(migrate_engine):
         tab_order=1
     )
     create_labeltext_widget(data, identifier, 0, 40,
-        labeltext="fk_p2_plan", field_identifier="fk_p2_plan", defaultvalue="",
+        labeltext="fk_p2_model", field_identifier="fk_p2_model", defaultvalue="",
         tab_order=2
     )
 
@@ -1559,7 +1559,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
         form_identifier=form_id,
         form_name="form_properties",
-        fk_p2_plan='p2_form',
+        fk_p2_model='p2_form',
         css="height:301px; width:400px;"
     )
 
@@ -1586,7 +1586,7 @@ def upgrade(migrate_engine):
     #result = data.p2_form.insert().execute(
     #    form_identifier=form_id,
     #    form_name="manage_flow_formlayout",
-    #    fk_p2_plan='p2_form',
+    #    fk_p2_model='p2_form',
     #    css="height:40px; width:400px;"
     #)
     #create_embeddedform_widget(data, form_id, 0, 0,
@@ -1603,7 +1603,7 @@ def upgrade(migrate_engine):
     #result = data.p2_form.insert().execute(
     #    form_identifier=form_id,
     #    form_name='manage_flow_formlayout_embedded_1',
-    #    fk_p2_plan='p2_widget',
+    #    fk_p2_model='p2_widget',
     #    css="height:40px; width:400px;")
     #   
     #form_name = 'manage_flow_formlayout_embedded_1_1'
@@ -1621,12 +1621,12 @@ def upgrade(migrate_engine):
     #        'Widget type', # label
     #        'widget_type', # foreignkeycol
     #        '_widget_type', # the mapped attribute
-    #        'p2_plan', # target_plan
+    #        'p2_model', # target_plan
     #        'id', # the attribute that is shown in the dropdown list 
     #        True, # required
     #        1, # tab_order,
     #        'p2_widget', # source_table,
-    #        'p2_plan' #target_table
+    #        'p2_model' #target_table
     #    )
     
 
@@ -1635,7 +1635,7 @@ def upgrade(migrate_engine):
     #result = data.p2_form.insert().execute(
     #    form_identifier=form_id,
     #    form_name=form_name,
-    #    fk_p2_plan=plan_id,
+    #    fk_p2_model=plan_id,
     #    css="height:40px; width:400px;")
 
     #create_labeltext_widget(data, form_id, 0, 0,
@@ -1654,8 +1654,8 @@ def upgrade(migrate_engine):
     #     post_update=False,
     #     source_table='p2_linkage',
     #     source_model='p2_linkage',
-    #     target_table='p2_plan',
-    #     target_model='p2_plan',
+    #     target_table='p2_model',
+    #     target_model='p2_model',
     # )
     #
     # linkage_id = insert_linkage(
@@ -1667,8 +1667,8 @@ def upgrade(migrate_engine):
     #     post_update=False,
     #     source_table='p2_linkage',
     #     source_model='p2_linkage',
-    #     target_table='p2_plan',
-    #     target_model='p2_plan',
+    #     target_table='p2_model',
+    #     target_model='p2_model',
     # )
     
     # Countries
@@ -1695,7 +1695,7 @@ def upgrade(migrate_engine):
     result = data.p2_form.insert().execute(
                              form_identifier='add_model_view',
                              form_name="add_model_view",
-                             fk_p2_plan='p2_plan',
+                             fk_p2_model='p2_model',
                              css="height:120px; width:310px;"
      )
     form_id = result.inserted_primary_key[0]

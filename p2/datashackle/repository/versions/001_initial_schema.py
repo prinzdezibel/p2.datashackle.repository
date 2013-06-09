@@ -19,7 +19,7 @@ class upgradedataobj(object):
 
 metadata = MetaData()
 
-p2_plan = Table('p2_plan',
+p2_model = Table('p2_model',
                 metadata,
                 Column('plan_identifier', String(length=255), primary_key=True, nullable=False, autoincrement=False),
                 Column('fk_default_form', String(10), index=True),
@@ -37,8 +37,8 @@ p2_form = Table('p2_form',
                 metadata,
                 Column('form_identifier', String(16), primary_key=True, autoincrement=False),
                 Column('form_name', String(63)),
-                Column('fk_p2_plan', 
-                       ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"),
+                Column('fk_p2_model',
+                       ForeignKey('p2_model.plan_identifier', onupdate="CASCADE"),
                        nullable=True),
                 Column('css', String(1023), nullable=False, default=''),
                 Column('fk_p2_formlayout',
@@ -51,7 +51,7 @@ p2_widget = Table('p2_widget',
                 metadata,
                 Column('widget_identifier', String(10), primary_key=True, autoincrement=False),
                 Column('fk_p2_form', ForeignKey('p2_form.form_identifier')),
-                Column('widget_type', ForeignKey('p2_plan.klass', onupdate="CASCADE")),
+                Column('widget_type', ForeignKey('p2_model.klass', onupdate="CASCADE")),
                 Column('css', String(1023), nullable=False, default=''),
                 Column('tab_order', Integer, nullable=False, default=0),
                 mysql_engine='InnoDB',
@@ -95,8 +95,8 @@ p2_linkage = Table('p2_linkage',
              Column('cascade', String(255), nullable=True),
              Column('fk_p2_relation', ForeignKey('p2_relation.id', onupdate="CASCADE"), nullable=True),
              Column('post_update', Boolean), #http://www.sqlalchemy.org/docs/05/mappers.html#rows-that-point-to-themselves-mutually-dependent-rows
-             Column('fk_source_model', ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"), nullable=True),
-             Column('fk_target_model', ForeignKey('p2_plan.plan_identifier', onupdate="CASCADE"), nullable=True),
+             Column('fk_source_model', ForeignKey('p2_model.plan_identifier', onupdate="CASCADE"), nullable=True),
+             Column('fk_target_model', ForeignKey('p2_model.plan_identifier', onupdate="CASCADE"), nullable=True),
              mysql_engine='InnoDB')
 
 
@@ -105,7 +105,7 @@ p2_span = Table('p2_span',
             Column('span_identifier', String(10)),
             Column('fk_p2_widget', ForeignKey('p2_widget.widget_identifier')),
             Column('span_name', String(63), index=True),
-            Column('span_type', ForeignKey('p2_plan.klass', onupdate="CASCADE")),
+            Column('span_type', ForeignKey('p2_model.klass', onupdate="CASCADE")),
             Column('span_value', String(255), nullable=True),
             Column('css', String(1023), nullable=False, default=''),
             Column('visible', Boolean, nullable=True, default=True),
@@ -229,7 +229,7 @@ def upgrade(migrate_engine):
     
     metadata.create_all()
 
-    ForeignKeyConstraint(columns=[p2_plan.c.fk_default_form]  , refcolumns=[p2_form.c.form_identifier]).create()
+    ForeignKeyConstraint(columns=[p2_model.c.fk_default_form]  , refcolumns=[p2_form.c.form_identifier]).create()
     
     # data dict for user data during upgrade/downgrade process 
     migrate_engine.data = {}
@@ -244,7 +244,7 @@ def upgrade(migrate_engine):
     
 def downgrade(migrate_engine):
     metadata.bind = migrate_engine 
-    ForeignKeyConstraint(columns=[p2_plan.c.fk_default_form]  , refcolumns=[p2_form.c.form_identifier]).drop()
+    ForeignKeyConstraint(columns=[p2_model.c.fk_default_form]  , refcolumns=[p2_form.c.form_identifier]).drop()
     
     # Operations to reverse the above upgrade go here.
     p2_span_dropdown.drop(migrate_engine)
@@ -260,7 +260,7 @@ def downgrade(migrate_engine):
     p2_archetype.drop(migrate_engine)
     p2_widget.drop(migrate_engine)
     p2_form.drop(migrate_engine)
-    p2_plan.drop(migrate_engine)
+    p2_model.drop(migrate_engine)
     p2_fieldtype.drop(migrate_engine)
     p2_cardinality.drop()
     p2_country.drop()
